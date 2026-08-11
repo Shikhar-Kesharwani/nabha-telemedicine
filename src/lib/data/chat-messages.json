@@ -1,0 +1,31 @@
+{
+    "messages": [
+        {
+            "text": "Hello! I am Dr. Priya Sharma. How can I help you today?",
+            "sender": "doctor",
+            "avatar": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=400&auto=format&fit=crop",
+            "user_email": "lakshya@gmail.com",
+            "doctor_id": "1",
+            "id": "1",
+            "timestamp": "2025-09-20T20:02:48.836Z"
+        },
+        {
+            "text": "3tdtt",
+            "sender": "user",
+            "avatar": "https://picsum.photos/seed/user/100/100",
+            "user_email": "lakshya@gmail.com",
+            "doctor_id": "1",
+            "id": "2",
+            "timestamp": "2025-09-20T20:02:54.454Z"
+        },
+        {
+            "text": "Thank you for your message. I am reviewing your request and will get back to you shortly.",
+            "sender": "doctor",
+            "avatar": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=400&auto=format&fit=crop",
+            "user_email": "lakshya@gmail.com",
+            "doctor_id": "1",
+            "id": "3",
+            "timestamp": "2025-09-20T20:02:56.196Z"
+        }
+    ]
+}

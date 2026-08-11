@@ -1,0 +1,50 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "email": "jane.smith@email.com",
+            "fullName": "Jane Smith",
+            "password": "$2a$10$3QZ.N3CgY7/X.A.QeXYh3u1SgLzPz.yC7p.B.xY2P.A.B.xY2P.A.",
+            "phone": "9876543210",
+            "dob": "1990-05-15",
+            "gender": "female",
+            "aadhaar": "123456789012",
+            "address": "123 Main St, Nabha"
+        },
+        {
+            "email": "sanchitjain@gmail.com",
+            "fullName": "jane",
+            "password": "$2a$10$RgfcmcHPqFXKt.T/r0hTvuAowFCYaCQnTlsyl.7PHecZNkO6.3hri",
+            "phone": "8707757627",
+            "id": 2
+        },
+        {
+            "email": "dinesh@gmail.com",
+            "fullName": "qndcnjcdn",
+            "password": "$2a$10$7pUqyCZacboB.Ttk4EdvX.uopliM79kXOOmz539fv/j8PL5tGvaYK",
+            "phone": "9935023275",
+            "id": 3
+        },
+        {
+            "email": "ayushgu02@gmail.com",
+            "fullName": "dsw",
+            "password": "$2a$10$NNM0ZgHf7uvGXQLd6mjuN..cYA7U2jGB.gjnOhqgZwifkUTVheVzG",
+            "phone": "8707757627",
+            "id": 4
+        },
+        {
+            "email": "lakshya@gmail.com",
+            "fullName": "lakshya",
+            "password": "$2a$10$hsoYYWieZqImbrSY5XTEX.PEtVLFYwrEKXKnbEzc8jjTy0rWmVpBC",
+            "phone": "9084180090",
+            "id": 5
+        },
+        {
+            "email": "rkbijoliya@rediffmail.com",
+            "fullName": "RAKSHIT BIJOLIYA",
+            "password": "$2a$10$/RfQ7M0YFFvCvJZfiW0kMO4hQFKxHRyOMWciAs1jnRzSSwPWxT4G.",
+            "phone": "09990049722",
+            "id": 6
+        }
+    ]
+}

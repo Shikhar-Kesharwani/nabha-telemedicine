@@ -1,0 +1,29 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Tiro+Devanagari+Hindi:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;700&display=swap');
+
+.title-container {
+    font-family: 'Poppins', sans-serif;
+}
+
+.title-text {
+    font-family: 'Tiro Devanagari Hindi', serif;
+    font-size: 6rem;
+    font-weight: 400;
+    position: relative;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    color: white;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.tagline {
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: -10px;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}

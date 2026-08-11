@@ -1,0 +1,39 @@
+{
+    "appointments": [
+        {
+            "userId": 5,
+            "type": "Doctor",
+            "name": "Dr. Meena Iyer",
+            "details": "Gynecologist",
+            "date": "2025-09-24",
+            "time": "02:30 PM",
+            "avatar": "https://picsum.photos/seed/doc8/400/400",
+            "dataAiHint": "doctor friendly",
+            "doctorId": 8,
+            "id": 1
+        },
+        {
+            "userId": 5,
+            "type": "Doctor",
+            "name": "Dr. Meena Iyer",
+            "details": "Gynecologist",
+            "date": "2025-09-24",
+            "time": "02:30 PM",
+            "avatar": "https://picsum.photos/seed/doc8/400/400",
+            "dataAiHint": "doctor friendly",
+            "doctorId": 8,
+            "id": 2
+        },
+        {
+            "userId": 5,
+            "type": "Lab Test",
+            "name": "Thyrocare Aarogyam Center",
+            "details": "Scheduled Lab Test",
+            "date": "2025-09-20",
+            "time": "10:00 AM",
+            "avatar": "https://picsum.photos/seed/lab/100/100",
+            "dataAiHint": "laboratory test tube",
+            "id": 3
+        }
+    ]
+}

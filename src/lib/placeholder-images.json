@@ -1,0 +1,40 @@
+{
+  "placeholderImages": [
+    {
+      "id": "doctor-1",
+      "description": "Profile picture of Dr. Priya Sharma",
+      "imageUrl": "https://picsum.photos/seed/doc1/100/100",
+      "imageHint": "doctor portrait"
+    },
+    {
+      "id": "doctor-2",
+      "description": "Profile picture of Dr. Rohan Mehra",
+      "imageUrl": "https://picsum.photos/seed/doc2/100/100",
+      "imageHint": "doctor professional"
+    },
+    {
+      "id": "doctor-3",
+      "description": "Profile picture of Dr. Anjali Desai",
+      "imageUrl": "https://picsum.photos/seed/doc3/100/100",
+      "imageHint": "doctor smiling"
+    },
+    {
+      "id": "map-placeholder",
+      "description": "Placeholder image of a city map showing pharmacy locations",
+      "imageUrl": "https://picsum.photos/seed/map1/1200/600",
+      "imageHint": "city map"
+    },
+    {
+      "id": "video-call-doctor",
+      "description": "Placeholder image for a doctor on a video call",
+      "imageUrl": "https://picsum.photos/seed/doc4/800/600",
+      "imageHint": "doctor video"
+    },
+    {
+      "id": "user-avatar",
+      "description": "Placeholder avatar for a user",
+      "imageUrl": "https://picsum.photos/seed/user/100/100",
+      "imageHint": "person portrait"
+    }
+  ]
+}

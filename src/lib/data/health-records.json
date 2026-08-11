@@ -1,0 +1,66 @@
+{
+  "records": {
+    "1": [
+      {
+        "id": 6,
+        "name": "Dermatology Initial Visit",
+        "date": "2023-09-12",
+        "type": "Consultation Note",
+        "doctor": "Dr. Sunita Kaur"
+      },
+      {
+        "id": 7,
+        "name": "Allergy Test Panel",
+        "date": "2023-09-20",
+        "type": "Lab Result",
+        "doctor": "Dr. Sunita Kaur"
+      },
+      {
+        "id": 8,
+        "name": "Tretinoin Prescription",
+        "date": "2023-09-20",
+        "type": "Prescription",
+        "doctor": "Dr. Sunita Kaur"
+      },
+      {
+        "id": 9,
+        "name": "Dermatology Follow-up",
+        "date": "2023-12-15",
+        "type": "Consultation Note",
+        "doctor": "Dr. Sunita Kaur"
+      }
+    ],
+    "2": [
+      {
+        "id": 10,
+        "name": "Ophthalmology Exam",
+        "date": "2024-03-01",
+        "type": "Report",
+        "doctor": "Dr. Vikram Singh"
+      },
+      {
+        "id": 11,
+        "name": "Vitamin B12 & D Test",
+        "date": "2024-03-05",
+        "type": "Lab Result",
+        "doctor": "Dr. Rajesh Gupta"
+      },
+      {
+        "id": 12,
+        "name": "Paracetamol Prescription",
+        "date": "2024-04-11",
+        "type": "Prescription",
+        "doctor": "Dr. Rajesh Gupta"
+      }
+    ]
+  },
+  "sampleReportContents": {
+    "6": "Patient: Jane Smith\nDate: 2023-09-12\nDoctor: Dr. Sunita Kaur\n\nDERMATOLOGY INITIAL VISIT...\n\nCHIEF COMPLAINT: Acne and uneven skin tone.",
+    "7": "Patient: Jane Smith\nDate: 2023-09-20\n\nALLERGY TEST PANEL...\n\nRESULTS: Mild reaction to dust mites. No significant food allergies detected.",
+    "8": "Patient: Jane Smith\nDate: 2023-09-20\n\nPRESCRIPTION: Tretinoin 0.025% Cream. Apply a pea-sized amount at night.",
+    "9": "Patient: Jane Smith\nDate: 2023-12-15\n\nDERMATOLOGY FOLLOW-UP...\n\nASSESSMENT: Significant improvement in acne. Patient tolerating Tretinoin well.",
+    "10": "Patient: Sample User 1\nDate: 2024-03-01\n\nEYE CHECK-UP REPORT...\n\nVision: 20/20 in both eyes. No signs of glaucoma.",
+    "11": "Patient: Sample User 1\nDate: 2024-03-05\n\nVITAMIN D & B12 TEST...\n\nResult D: 25 ng/mL (Insufficient). Result B12: 300 pg/mL (Normal). Recommendation: D Supplementation.",
+    "12": "Patient: Sample User 1\nDate: 2024-04-11\n\nPRESCRIPTION: Paracetamol 650mg for viral fever."
+  }
+}
