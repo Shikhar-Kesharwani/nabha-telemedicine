@@ -129,10 +129,14 @@ export default function DoctorChatRoomPage() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setAttachment({
-        name: file.name,
-        url: URL.createObjectURL(file),
-      });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAttachment({
+          name: file.name,
+          url: reader.result as string,
+        });
+      };
+      reader.readAsDataURL(file);
     }
   };
 

@@ -161,42 +161,48 @@ ${rec.content || 'Official digital health record stored securely in SEHAT Medica
 
       {/* Records Table List */}
       <div className="space-y-3">
-        {filtered.map(rec => (
-          <div
-            key={rec.id}
-            className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 card-3d-hover"
-          >
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--accent-amber)]/10 text-[var(--accent-amber)]">
-                <FileText size={22} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h4 className="font-bold text-base text-[var(--text-primary)]">{rec.name}</h4>
-                  <StatusBadge variant="amber">{rec.type}</StatusBadge>
-                </div>
-                <p className="text-xs text-[var(--text-muted)] mt-1">
-                  Provider: <span className="text-[var(--text-primary)] font-medium">{rec.doctor}</span> • Date: {rec.date}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <button
-                onClick={() => setSelectedRecord(rec)}
-                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border)] px-3.5 py-2 text-xs font-bold text-[var(--text-primary)] hover:bg-white/5"
-              >
-                <Eye size={14} /> View
-              </button>
-              <button
-                onClick={() => downloadRecord(rec)}
-                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-amber-500/20 hover:opacity-95"
-              >
-                <Download size={14} /> Download
-              </button>
-            </div>
+        {filtered.length === 0 ? (
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center text-sm text-[var(--text-muted)]">
+            No health records found matching category &quot;{category}&quot;.
           </div>
-        ))}
+        ) : (
+          filtered.map(rec => (
+            <div
+              key={rec.id}
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 card-3d-hover"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--accent-amber)]/10 text-[var(--accent-amber)]">
+                  <FileText size={22} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold text-base text-[var(--text-primary)]">{rec.name}</h4>
+                    <StatusBadge variant="amber">{rec.type}</StatusBadge>
+                  </div>
+                  <p className="text-xs text-[var(--text-muted)] mt-1">
+                    Provider: <span className="text-[var(--text-primary)] font-medium">{rec.doctor}</span> • Date: {rec.date}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button
+                  onClick={() => setSelectedRecord(rec)}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border)] px-3.5 py-2 text-xs font-bold text-[var(--text-primary)] hover:bg-white/5"
+                >
+                  <Eye size={14} /> View
+                </button>
+                <button
+                  onClick={() => downloadRecord(rec)}
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-amber-500/20 hover:opacity-95"
+                >
+                  <Download size={14} /> Download
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* View Record Preview Modal */}

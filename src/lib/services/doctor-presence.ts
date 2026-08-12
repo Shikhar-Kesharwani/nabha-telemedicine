@@ -54,25 +54,8 @@ export function broadcastDoctorOnline(doctorId: string) {
   updateMap();
   const interval = setInterval(updateMap, 5000);
 
-  const handleUnload = () => {
-    const map = getPresenceMap();
-    delete map[doctorId];
-    setPresenceMap(map);
-    try {
-      const bc = new BroadcastChannel(PRESENCE_CHANNEL);
-      bc.postMessage({ type: 'PRESENCE_HEARTBEAT', activeDoctors: Object.keys(map) });
-      bc.close();
-    } catch (e) {
-      console.warn("BroadcastChannel unload error:", e);
-    }
-  };
-
-  window.addEventListener('beforeunload', handleUnload);
-
   return () => {
     clearInterval(interval);
-    handleUnload();
-    window.removeEventListener('beforeunload', handleUnload);
   };
 }
 

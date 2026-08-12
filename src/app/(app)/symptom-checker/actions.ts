@@ -42,10 +42,9 @@ export async function aiSymptomGuidance({
   const renderBackendUrl = process.env.NEXT_PUBLIC_RENDER_BACKEND_URL;
 
   if (renderBackendUrl) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
-
       const response = await fetch(`${renderBackendUrl}/api/ai/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -53,13 +52,14 @@ export async function aiSymptomGuidance({
         cache: 'no-store',
         signal: controller.signal,
       });
-      clearTimeout(timeoutId);
       if (response.ok) {
         const data = await response.json();
         return data;
       }
     } catch (e) {
       console.warn("Render Backend API fetch failed or timed out, falling back to local Dataset model:", e);
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
