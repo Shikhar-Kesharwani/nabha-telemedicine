@@ -3,10 +3,10 @@
 <div align="center">
 
 <!-- ═══════════════════════════════════════════════════════════════════ -->
-<!-- HERO SECTION — Multi-layer animated header -->
+<!-- HERO SECTION — Official Nabha Platform Graphic Banner -->
 <!-- ═══════════════════════════════════════════════════════════════════ -->
 
-![Hero Banner](https://capsule-render.vercel.app/api?type=waving&color=0:0a0a18,25:6366f1,50:a855f7,75:22d3ee,100:0a0a18&height=280&section=header&text=🏥%20Nabha%20Telemedicine&fontSize=48&fontColor=f1f5f9&fontAlignY=30&desc=AI-Powered%20Rural%20Healthcare%20Platform&descSize=18&descAlignY=52&descColor=cbd5e1&animation=twinkling&stroke=22d3ee&strokeWidth=1)
+![Nabha - Care connects us all](public/nabha-banner.png)
 
 <br/>
 
