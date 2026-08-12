@@ -87,6 +87,10 @@ function VideoCallComponent() {
   };
   
   const handleEndCall = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
     toast({
         title: "Call Ended",
         description: `Your call with ${patient?.name || 'the patient'} has ended.`,

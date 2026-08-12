@@ -98,6 +98,8 @@ export default function VideoCallRoomPage() {
       }
     }
 
+    const pendingCandidates: RTCIceCandidateInit[] = [];
+
     initMedia();
 
     signalingChannel.onmessage = async (e) => {
@@ -111,16 +113,28 @@ export default function VideoCallRoomPage() {
         signalingChannel.postMessage({ type: "offer", offer: offerJson });
       } else if (msg.type === "offer") {
         await pc.setRemoteDescription(new RTCSessionDescription(msg.offer));
+        for (const cand of pendingCandidates) {
+          try { await pc.addIceCandidate(new RTCIceCandidate(cand)); } catch (err) { console.warn("Queued ICE error:", err); }
+        }
+        pendingCandidates.length = 0;
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         const answerJson = { sdp: answer.sdp, type: answer.type };
         signalingChannel.postMessage({ type: "answer", answer: answerJson });
       } else if (msg.type === "answer") {
         await pc.setRemoteDescription(new RTCSessionDescription(msg.answer));
+        for (const cand of pendingCandidates) {
+          try { await pc.addIceCandidate(new RTCIceCandidate(cand)); } catch (err) { console.warn("Queued ICE error:", err); }
+        }
+        pendingCandidates.length = 0;
       } else if (msg.type === "candidate") {
         try {
           if (msg.candidate) {
-            await pc.addIceCandidate(new RTCIceCandidate(msg.candidate));
+            if (pc.remoteDescription) {
+              await pc.addIceCandidate(new RTCIceCandidate(msg.candidate));
+            } else {
+              pendingCandidates.push(msg.candidate);
+            }
           }
         } catch (err) {
           console.error("ICE candidate error:", err);
@@ -130,6 +144,9 @@ export default function VideoCallRoomPage() {
 
     return () => {
       localStreamRef.current?.getTracks().forEach((t) => t.stop());
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = null;
+      }
       pc.close();
       signalingChannel.close();
     };

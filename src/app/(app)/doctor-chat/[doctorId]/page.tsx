@@ -42,6 +42,8 @@ export default function DoctorChatRoomPage() {
   const userEmail = "user@example.com";
   const userAvatar = "https://picsum.photos/seed/user-avatar/200/200";
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     async function initData() {
       if (doctorId) {
@@ -54,6 +56,10 @@ export default function DoctorChatRoomPage() {
     }
     initData();
   }, [doctorId]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   // Subscribe to Call Permission status granted by Doctor
   useEffect(() => {
@@ -256,6 +262,7 @@ export default function DoctorChatRoomPage() {
             </div>
           );
         })}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input Bar */}
