@@ -6,13 +6,7 @@ import { SectionHeader, StatusBadge } from "@/components/primitives";
 import { getActiveSubscriptions, toggleSubscription, type StockNotification } from "@/lib/services/medicine-subscriptions";
 import { getMedicines, type Medicine } from "@/lib/services/medicines";
 import { useToast } from "@/hooks/use-toast";
-
-function getSession() {
-  if (typeof window === 'undefined') return null;
-  const patientSession = localStorage.getItem('sehat-session-patient');
-  if (patientSession) return { type: 'patient', ...JSON.parse(patientSession) };
-  return null;
-}
+import { getSession } from "@/lib/session";
 
 export default function MedicineFinderPage() {
   const [query, setQuery] = useState("");
@@ -81,6 +75,48 @@ export default function MedicineFinderPage() {
         />
       </div>
 
+      {/* Brand-to-Generic Price Difference Calculator Widget */}
+      <div className="rounded-3xl border border-[var(--accent-emerald)]/30 bg-gradient-to-br from-[#06150e] to-[#0d0d1a] p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <span className="text-xl">🧮</span>
+          <div>
+            <h3 className="font-bold text-base text-[var(--text-primary)]">Jan Aushadhi Brand-to-Generic Price Calculator</h3>
+            <p className="text-xs text-[var(--text-muted)]">Compare branded doctor prescriptions with Jan Aushadhi generic substitutes in Nabha.</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {[
+            { branded: "Augmentin 625mg", brandPrice: 204, generic: "Amoxicillin + Clav 625mg", genericPrice: 52, store: "Jan Aushadhi Central Nabha" },
+            { branded: "Glucophage 500mg", brandPrice: 180, generic: "Metformin 500mg", genericPrice: 18, store: "Jan Aushadhi Central Nabha" },
+            { branded: "Lipitor 10mg", brandPrice: 240, generic: "Atorvastatin 10mg", genericPrice: 28, store: "Jan Aushadhi Model Town" },
+            { branded: "Pantocid 40mg", brandPrice: 165, generic: "Pantoprazole 40mg", genericPrice: 22, store: "Jan Aushadhi Model Town" },
+            { branded: "Calpol / Crocin 500", brandPrice: 40, generic: "Paracetamol 500mg", genericPrice: 12, store: "Jan Aushadhi Central Nabha" },
+            { branded: "Allegra 120mg", brandPrice: 210, generic: "Cetirizine 10mg", genericPrice: 10, store: "Jan Aushadhi Central Nabha" },
+          ].map((item, idx) => {
+            const savings = item.brandPrice - item.genericPrice;
+            const percent = Math.round((savings / item.brandPrice) * 100);
+            return (
+              <div key={idx} className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-[var(--text-muted)] line-through">Branded: {item.branded} (₹{item.brandPrice})</span>
+                  <span className="rounded-full px-2 py-0.5 text-[10px] font-extrabold bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)] border border-[var(--accent-emerald)]/30">
+                    Save {percent}%
+                  </span>
+                </div>
+                <p className="font-extrabold text-sm text-[var(--text-primary)]">{item.generic}</p>
+                <div className="flex items-baseline justify-between pt-1 border-t border-[var(--border)]">
+                  <span className="text-xs text-[var(--text-muted)]">{item.store}</span>
+                  <span className="text-sm font-black text-[var(--accent-emerald)]">
+                    ₹{item.genericPrice} <span className="text-[10px] font-normal text-[var(--text-muted)]">(Save ₹{savings})</span>
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="space-y-4">
         {filtered.map((med) => {
           const subscribed = isSubscribed(med.brandName);
@@ -130,6 +166,16 @@ export default function MedicineFinderPage() {
             </div>
           );
         })}
+
+        {filtered.length === 0 && (
+          <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-12 text-center space-y-3">
+            <Pill className="mx-auto h-12 w-12 text-[var(--text-muted)] opacity-40" />
+            <h3 className="text-base font-bold text-[var(--text-primary)]">No Medicines Found</h3>
+            <p className="text-xs text-[var(--text-muted)] max-w-md mx-auto">
+              No government generic medicines match &quot;{query}&quot;. Try searching by chemical composition (e.g., Metformin, Amoxicillin, Paracetamol) or check back after the next Jan Aushadhi consignment arrives.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

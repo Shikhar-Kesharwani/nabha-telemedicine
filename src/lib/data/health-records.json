@@ -3,64 +3,38 @@
     "1": [
       {
         "id": 6,
-        "name": "Dermatology Initial Visit",
-        "date": "2023-09-12",
-        "type": "Consultation Note",
-        "doctor": "Dr. Sunita Kaur"
+        "name": "HbA1c Blood Sugar Test",
+        "date": "2024-03-10",
+        "type": "Lab Result",
+        "doctor": "Dr. Harpreet Kaur"
       },
       {
         "id": 7,
-        "name": "Allergy Test Panel",
-        "date": "2023-09-20",
-        "type": "Lab Result",
-        "doctor": "Dr. Sunita Kaur"
+        "name": "ECG — Resting Electrocardiogram",
+        "date": "2024-04-02",
+        "type": "Diagnostic Report",
+        "doctor": "Dr. Gurpreet Singh"
       },
       {
         "id": 8,
-        "name": "Tretinoin Prescription",
-        "date": "2023-09-20",
+        "name": "Metformin 500mg — Diabetes Prescription",
+        "date": "2024-03-10",
         "type": "Prescription",
-        "doctor": "Dr. Sunita Kaur"
+        "doctor": "Dr. Harpreet Kaur"
       },
       {
         "id": 9,
-        "name": "Dermatology Follow-up",
-        "date": "2023-12-15",
-        "type": "Consultation Note",
-        "doctor": "Dr. Sunita Kaur"
-      }
-    ],
-    "2": [
-      {
-        "id": 10,
-        "name": "Ophthalmology Exam",
-        "date": "2024-03-01",
-        "type": "Report",
-        "doctor": "Dr. Vikram Singh"
-      },
-      {
-        "id": 11,
-        "name": "Vitamin B12 & D Test",
-        "date": "2024-03-05",
+        "name": "Dengue NS1 Antigen Test",
+        "date": "2024-08-18",
         "type": "Lab Result",
-        "doctor": "Dr. Rajesh Gupta"
-      },
-      {
-        "id": 12,
-        "name": "Paracetamol Prescription",
-        "date": "2024-04-11",
-        "type": "Prescription",
-        "doctor": "Dr. Rajesh Gupta"
+        "doctor": "Dr. Mandeep Sidhu"
       }
     ]
   },
   "sampleReportContents": {
-    "6": "Patient: Jane Smith\nDate: 2023-09-12\nDoctor: Dr. Sunita Kaur\n\nDERMATOLOGY INITIAL VISIT...\n\nCHIEF COMPLAINT: Acne and uneven skin tone.",
-    "7": "Patient: Jane Smith\nDate: 2023-09-20\n\nALLERGY TEST PANEL...\n\nRESULTS: Mild reaction to dust mites. No significant food allergies detected.",
-    "8": "Patient: Jane Smith\nDate: 2023-09-20\n\nPRESCRIPTION: Tretinoin 0.025% Cream. Apply a pea-sized amount at night.",
-    "9": "Patient: Jane Smith\nDate: 2023-12-15\n\nDERMATOLOGY FOLLOW-UP...\n\nASSESSMENT: Significant improvement in acne. Patient tolerating Tretinoin well.",
-    "10": "Patient: Sample User 1\nDate: 2024-03-01\n\nEYE CHECK-UP REPORT...\n\nVision: 20/20 in both eyes. No signs of glaucoma.",
-    "11": "Patient: Sample User 1\nDate: 2024-03-05\n\nVITAMIN D & B12 TEST...\n\nResult D: 25 ng/mL (Insufficient). Result B12: 300 pg/mL (Normal). Recommendation: D Supplementation.",
-    "12": "Patient: Sample User 1\nDate: 2024-04-11\n\nPRESCRIPTION: Paracetamol 650mg for viral fever."
+    "6": "Patient: Jane Smith\nDate: 2024-03-10\nDoctor: Dr. Harpreet Kaur, Diabetologist\nHospital: Nabha Telemedicine Centre\n\nHbA1c BLOOD SUGAR TEST\n\nResult: HbA1c = 7.4% (Controlled Diabetic Range)\nFasting Glucose: 128 mg/dL\nPostprandial: 182 mg/dL\n\nASSESSMENT: Diabetes is partially controlled. Target HbA1c < 7.0%.\nRECOMMENDATION: Continue Metformin 500mg BD. Reduce rice/roti intake. Walk 30 min daily. Repeat HbA1c in 3 months.",
+    "7": "Patient: Jane Smith\nDate: 2024-04-02\nDoctor: Dr. Gurpreet Singh, Cardiologist\nHospital: Rajindra Hospital, Patiala\n\nRESTING ECG REPORT\n\nRate: 76 bpm, Regular Sinus Rhythm\nPR Interval: 0.16s (Normal)\nQRS: 0.08s (Normal)\nST Segment: No ST elevation or depression\n\nCONCLUSION: Normal ECG. No acute ischemic changes.\nRECOMMENDATION: Continue Amlodipine 5mg for hypertension. Avoid salt. Recheck in 6 months.",
+    "8": "Patient: Jane Smith\nDate: 2024-03-10\nDoctor: Dr. Harpreet Kaur\n\nPRESCRIPTION:\n- Metformin 500mg (Generic — Jan Aushadhi) — 1 tablet twice daily with meals\n- Atorvastatin 10mg (Generic — Jan Aushadhi) — 1 tablet at night\n\nNote: Available at Jan Aushadhi Kendra, Civil Hospital Nabha at 80% less than branded price.",
+    "9": "Patient: Jane Smith\nDate: 2024-08-18\nDoctor: Dr. Mandeep Sidhu, General Physician\nHospital: Civil Hospital Nabha (SDH)\n\nDENGUE NS1 ANTIGEN TEST\n\nResult: NS1 Antigen — NEGATIVE\nPlatelet Count (CBC): 1.8 Lakh/uL (Normal > 1.5 Lakh)\n\nASSESSMENT: Dengue ruled out. Likely viral fever.\nRECOMMENDATION: Paracetamol 650mg for fever. Oral rehydration salts. Avoid NSAIDs (ibuprofen). Rest 5 days. Return if platelets drop or rash appears."
   }
 }

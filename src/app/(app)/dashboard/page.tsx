@@ -24,6 +24,7 @@ import {
   ArrowRight,
   User,
   FlaskConical,
+  TriangleAlert,
 } from "lucide-react";
 import { SectionHeader, StatCard, StatusBadge } from "@/components/primitives";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
@@ -32,42 +33,75 @@ import { getActiveSubscriptions, dismissNotification as dismissSubscription, typ
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO, isToday, isTomorrow } from "date-fns";
 
-const initialChartData = [
-  { month: "Jan", score: 78 },
-  { month: "Feb", score: 81 },
-  { month: "Mar", score: 85 },
-  { month: "Apr", score: 83 },
-  { month: "May", score: 89 },
-  { month: "Jun", score: 94 },
-];
+import { getLatestVitals, recordVitals } from "@/lib/services/vitals";
+import { getSession } from "@/lib/session";
+
+const generateRecentMonthsChartData = () => {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const currentMonthIdx = new Date().getMonth();
+  const data = [];
+  const baseScores = [78, 81, 85, 83, 89, 94];
+  for (let i = 5; i >= 0; i--) {
+    const mIdx = (currentMonthIdx - i + 12) % 12;
+    data.push({
+      month: months[mIdx],
+      score: baseScores[5 - i],
+    });
+  }
+  return data;
+};
+
+const SEASONAL_ALERTS: Record<number, { title: string; message: string; variant: 'red' | 'amber' | 'emerald' }> = {
+  // June, July, August — Dengue/Malaria season
+  6: { title: '🦟 Dengue & Malaria Alert — Nabha Region', message: 'Peak vector-borne season. Watch for sudden high fever with severe joint pain, headache behind eyes, or skin rash. Visit Civil Hospital Nabha or call 108 immediately if platelets drop.', variant: 'red' },
+  7: { title: '🦟 Dengue & Malaria Alert — Nabha Region', message: 'Peak vector-borne season. Watch for sudden high fever with severe joint pain, headache behind eyes, or skin rash. Visit Civil Hospital Nabha or call 108 immediately if platelets drop.', variant: 'red' },
+  8: { title: '🌊 Monsoon Waterborne Disease Alert', message: 'Avoid unboiled water during monsoon. Risk of Hepatitis A/E, gastroenteritis. Use ORS if experiencing diarrhea. Free treatment available at Civil Hospital Nabha.', variant: 'amber' },
+  // October, November — Stubble burning season
+  10: { title: '🌫️ Stubble Burning Season — Air Quality Alert', message: 'Agricultural stubble burning causes severe air pollution across Punjab. Patients with asthma or COPD should wear N95 masks outdoors and keep rescue inhalers accessible.', variant: 'amber' },
+  11: { title: '🌫️ Dense Fog & Cold Wave Alert', message: 'Dense morning fog and cold waves increase risk of road accidents and respiratory infections. Elderly and children should avoid outdoor exposure between 6–9 AM.', variant: 'amber' },
+  // April, May — Heat season
+  4: { title: '🌡️ Heat Wave Advisory — Farm Workers', message: 'Temperatures rising across Punjab. Fieldworkers: drink water every 20 minutes, wear light cotton, rest in shade 12–3 PM. Symptoms of heat stroke: confusion, no sweating — call 108.', variant: 'red' },
+  5: { title: '🌡️ Heat Wave Advisory — Farm Workers', message: 'Temperatures rising across Punjab. Fieldworkers: drink water every 20 minutes, wear light cotton, rest in shade 12–3 PM. Symptoms of heat stroke: confusion, no sweating — call 108.', variant: 'red' },
+};
 
 const healthTips = [
-  "Hydration activates metabolic energy. Drink at least 8 glasses of water daily.",
-  "Including antioxidant-rich greens improves daily cardiovascular endurance.",
-  "30 minutes of daily active movement reduces chronic fatigue by 40%.",
-  "7 to 9 hours of restorative sleep accelerates deep tissue recovery.",
-  "Daily mindfulness reduces cortisol stress markers significantly."
+  "Check your blood sugar every morning if you have diabetes. Target fasting sugar: 80–130 mg/dL.",
+  "Reduce namak (salt) in your diet. Excess salt is the primary contributor to high BP in Punjab.",
+  "Drink filtered or boiled water during monsoon to prevent typhoid, Hepatitis A, and gastroenteritis.",
+  "Farm workers: wear protective masks and gloves when spraying agricultural chemicals. Wash hands thoroughly.",
+  "Walk 30 minutes after dinner. Daily walking reduces post-meal blood sugar levels by 15–20 mg/dL.",
+  "Generic diabetes and BP medicines are available at Jan Aushadhi Kendra (Civil Hospital Nabha) at 50–80% savings."
 ];
 
-function getSession() {
-  if (typeof window === 'undefined') return null;
-  const patientSession = localStorage.getItem('sehat-session-patient');
-  if (patientSession) return { type: 'patient', ...JSON.parse(patientSession) };
-  return null;
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good Morning";
+  if (hour < 17) return "Good Afternoon";
+  return "Good Evening";
 }
 
+const variantColors = {
+  red: { text: "#ef4444", bg: "rgba(239,68,68,0.1)", border: "#ef4444" },
+  amber: { text: "#f59e0b", bg: "rgba(245,158,11,0.1)", border: "#f59e0b" },
+  emerald: { text: "#10b981", bg: "rgba(16,185,129,0.1)", border: "#10b981" },
+};
+
 export default function DashboardPage() {
-  const [userName, setUserName] = useState("Jane Smith");
+  const [userName, setUserName] = useState("Harjinder Singh");
   const [userId, setUserId] = useState<number | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [stockNotifications, setStockNotifications] = useState<StockNotification[]>([]);
   const [healthTip, setHealthTip] = useState("");
+  const [dismissedSeasonalAlert, setDismissedSeasonalAlert] = useState(false);
   const { toast } = useToast();
 
   // Vitals State
   const [heartRate, setHeartRate] = useState(72);
+  const [systolic, setSystolic] = useState(120);
+  const [diastolic, setDiastolic] = useState(80);
+  const [spO2, setSpO2] = useState(99);
   const [waterCount, setWaterCount] = useState(6);
-  const [chartData, setChartData] = useState(initialChartData);
+  const [chartData, setChartData] = useState(generateRecentMonthsChartData);
   const [isScanningPulse, setIsScanningPulse] = useState(false);
 
   useEffect(() => {
@@ -76,7 +110,9 @@ export default function DashboardPage() {
       setUserId(session.userId || 1);
       if (session.fullName) setUserName(session.fullName);
     }
-    setHealthTip(healthTips[Math.floor(Math.random() * healthTips.length)]);
+    // Day-seeded stable health tip (updates once every 24 hours, stable across renders)
+    const dayOfYear = Math.floor(Date.now() / 86400000);
+    setHealthTip(healthTips[dayOfYear % healthTips.length]);
   }, []);
 
   useEffect(() => {
@@ -86,6 +122,15 @@ export default function DashboardPage() {
       setAppointments(userAppointments.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
       const activeNotifications = await getActiveSubscriptions();
       setStockNotifications(activeNotifications);
+
+      // Load persisted vitals from SQLite
+      const savedVitals = await getLatestVitals(userId!);
+      if (savedVitals) {
+        setHeartRate(savedVitals.heartRate);
+        setSystolic(savedVitals.systolic);
+        setDiastolic(savedVitals.diastolic);
+        setSpO2(savedVitals.spO2);
+      }
     }
     loadData();
   }, [userId]);
@@ -95,17 +140,73 @@ export default function DashboardPage() {
     setStockNotifications(prev => prev.filter(n => n.id !== id));
   };
 
-  const measureHeartRate = () => {
+  const measureHeartRate = async () => {
     setIsScanningPulse(true);
-    setTimeout(() => {
+    setTimeout(async () => {
       const randomPulse = Math.floor(68 + Math.random() * 14);
       setHeartRate(randomPulse);
       setIsScanningPulse(false);
+
+      if (userId) {
+        await recordVitals({
+          userId,
+          heartRate: randomPulse,
+          systolic,
+          diastolic,
+          spO2,
+          bloodGlucose: 105,
+        });
+      }
+
       toast({
         title: "Optical Pulse Scan Complete ❤️",
-        description: `Heart rhythm synchronized at ${randomPulse} BPM (Optimal Resting Pulse).`,
+        description: `Heart rhythm synchronized at ${randomPulse} BPM (Optimal Resting Pulse). Saved to database.`,
       });
     }, 500);
+  };
+
+  const logBpReading = async () => {
+    const sys = Math.floor(115 + Math.random() * 15);
+    const dia = Math.floor(75 + Math.random() * 10);
+    setSystolic(sys);
+    setDiastolic(dia);
+
+    if (userId) {
+      await recordVitals({
+        userId,
+        heartRate,
+        systolic: sys,
+        diastolic: dia,
+        spO2,
+        bloodGlucose: 105,
+      });
+    }
+
+    toast({
+      title: "Blood Pressure Recorded 🩸",
+      description: `Logged BP reading: ${sys}/${dia} mmHg. Saved to database.`,
+    });
+  };
+
+  const logSpO2Reading = async () => {
+    const reading = Math.floor(97 + Math.random() * 3);
+    setSpO2(reading);
+
+    if (userId) {
+      await recordVitals({
+        userId,
+        heartRate,
+        systolic,
+        diastolic,
+        spO2: reading,
+        bloodGlucose: 105,
+      });
+    }
+
+    toast({
+      title: "Oxygen Saturation (SpO2) Updated 🫁",
+      description: `Pulse oximeter reading: ${reading}% SpO2. Saved to database.`,
+    });
   };
 
   const addWaterGlass = () => {
@@ -144,14 +245,14 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3">
               <span className="glow-dot-green" />
               <span className="rounded-full border border-[var(--accent-indigo)]/30 bg-[var(--accent-indigo)]/10 px-3.5 py-1 text-xs font-extrabold uppercase tracking-wider text-[var(--accent-indigo)]">
-                SEHAT Health Engine 3.0
+                SEHAT Health Engine 3.0 · Nabha, Punjab
               </span>
             </div>
             <h1 className="font-display text-3xl sm:text-5xl text-[var(--text-primary)] leading-tight">
-              Good Morning, <span className="text-gradient">{userName}</span> 👋
+              {getGreeting()}, <span className="text-gradient">{userName}</span> 👋
             </h1>
             <p className="text-[var(--text-muted)] text-sm max-w-xl leading-relaxed">
-              Biometrics synchronized. You have <strong className="text-[var(--accent-emerald)] font-bold">{appointments.length} active consultation{appointments.length !== 1 ? 's' : ''}</strong> scheduled for today.
+              Health Dashboard · Nabha Region. You have <strong className="text-[var(--accent-emerald)] font-bold">{appointments.length} active consultation{appointments.length !== 1 ? 's' : ''}</strong> scheduled.
             </p>
           </div>
 
@@ -183,6 +284,32 @@ export default function DashboardPage() {
           </button>
         </div>
       ))}
+
+      {/* Seasonal Alert Banner */}
+      {!dismissedSeasonalAlert && SEASONAL_ALERTS[new Date().getMonth() + 1] && (() => {
+        const alert = SEASONAL_ALERTS[new Date().getMonth() + 1];
+        const colors = variantColors[alert.variant];
+        return (
+          <div
+            className="relative flex items-start gap-4 rounded-2xl border-l-4 border-y border-r border-[var(--border)] bg-[var(--surface)] p-5 shadow-lg"
+            style={{ borderLeftColor: colors.border }}
+          >
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold"
+              style={{ backgroundColor: colors.bg, color: colors.text }}
+            >
+              <TriangleAlert size={20} />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-display text-base font-bold" style={{ color: colors.text }}>{alert.title}</h3>
+              <p className="mt-1 text-sm text-[var(--text-primary)] leading-relaxed">{alert.message}</p>
+            </div>
+            <button onClick={() => setDismissedSeasonalAlert(true)} className="rounded-lg p-1 text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]">
+              <X size={16} />
+            </button>
+          </div>
+        );
+      })()}
 
       {/* Biometric Vitals Stat Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -220,15 +347,23 @@ export default function DashboardPage() {
           label="Blood Pressure"
           value={
             <div className="flex items-baseline gap-1.5">
-              <span>120/80</span>
+              <span>{systolic}/{diastolic}</span>
               <span className="text-xs font-bold text-[var(--text-muted)] uppercase">mmHg</span>
             </div>
           }
-          badge={<StatusBadge variant="cyan">Standard</StatusBadge>}
+          badge={<StatusBadge variant="cyan">{systolic > 130 ? "Elevated" : "Standard"}</StatusBadge>}
           footer={
-            <span className="text-[11px] text-[var(--accent-emerald)] font-bold flex items-center gap-1 mt-1">
-              <ShieldCheck size={13} /> Ideal Systolic/Diastolic
-            </span>
+            <div className="space-y-2 mt-1">
+              <span className="text-[11px] text-[var(--accent-emerald)] font-bold flex items-center gap-1">
+                <ShieldCheck size={13} /> {systolic > 130 ? "Monitor BP Daily" : "Ideal Systolic/Diastolic"}
+              </span>
+              <button
+                onClick={logBpReading}
+                className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-[var(--accent-cyan)]/40 bg-[var(--accent-cyan)]/10 text-[var(--accent-cyan)] py-1.5 text-xs font-bold hover:bg-[var(--accent-cyan)]/20"
+              >
+                <Plus size={13} /> Log BP Reading
+              </button>
+            </div>
           }
         />
 
@@ -264,15 +399,23 @@ export default function DashboardPage() {
           label="SpO2 Oxygen"
           value={
             <div className="flex items-baseline gap-1.5">
-              <span>99%</span>
+              <span>{spO2}%</span>
               <span className="text-xs font-bold text-[var(--text-muted)] uppercase">Sat</span>
             </div>
           }
           badge={<StatusBadge variant="indigo">Pulse Sat</StatusBadge>}
           footer={
-            <span className="text-[11px] text-[var(--accent-emerald)] font-bold flex items-center gap-1 mt-1">
-              <ShieldCheck size={13} /> High Tissue Oxygenation
-            </span>
+            <div className="space-y-2 mt-1">
+              <span className="text-[11px] text-[var(--accent-emerald)] font-bold flex items-center gap-1">
+                <ShieldCheck size={13} /> High Tissue Oxygenation
+              </span>
+              <button
+                onClick={logSpO2Reading}
+                className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-[var(--accent-indigo)]/40 bg-[var(--accent-indigo)]/10 text-[var(--accent-indigo)] py-1.5 text-xs font-bold hover:bg-[var(--accent-indigo)]/20"
+              >
+                <Plus size={13} /> Log SpO2
+              </button>
+            </div>
           }
         />
       </div>

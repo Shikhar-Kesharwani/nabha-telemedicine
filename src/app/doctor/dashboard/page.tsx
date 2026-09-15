@@ -87,24 +87,97 @@ export default function DoctorDashboardPage() {
     e.preventDefault();
     if (!selectedPatient) return;
 
-    const rxContent = `DIGITAL PRESCRIPTION
-================================================
-Patient: ${selectedPatient.name} (${selectedPatient.age}y / ${selectedPatient.gender})
-Chief Complaint: ${selectedPatient.complaint}
-Prescribed By: Dr. Rajesh Sharma, MD (Reg #PB-98765)
-Date: ${new Date().toLocaleDateString()}
+    const signatureCode = `SEHAT-PB-${Math.floor(100000 + Math.random() * 900000)}`;
+    const dateStr = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
-Rx MEDICATIONS:
-- Medication: ${medication}
-- Dosage:     ${dosage}
-- Frequency:  ${frequency}
-- Duration:   ${durationDays} Days
+    const htmlDoc = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Prescription - ${selectedPatient.name}</title>
+  <style>
+    @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .no-print { display: none; } }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 32px; color: #0f172a; background: #fff; }
+    .header { border-bottom: 2px solid #0284c7; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
+    .hospital { font-size: 20px; font-weight: 800; color: #0f172a; margin: 0; }
+    .sub { font-size: 12px; color: #64748b; margin: 2px 0 0; }
+    .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 8px; }
+    .patient-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; font-size: 13px; }
+    .rx-symbol { font-size: 32px; font-weight: 900; color: #0284c7; font-family: serif; margin-bottom: 12px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+    th { background: #f1f5f9; text-align: left; padding: 10px 12px; border: 1px solid #cbd5e1; font-weight: 700; font-size: 12px; }
+    td { padding: 10px 12px; border: 1px solid #e2e8f0; }
+    .advice-box { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px 16px; margin-bottom: 32px; font-size: 13px; color: #92400e; border-radius: 0 8px 8px 0; }
+    .footer { border-top: 1px solid #e2e8f0; padding-top: 20px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; color: #64748b; }
+    .seal { border: 2px dashed #0284c7; border-radius: 10px; padding: 8px 14px; text-align: center; color: #0284c7; font-weight: 700; font-size: 11px; }
+    .print-btn { background: #0284c7; color: #fff; border: none; padding: 10px 20px; font-size: 13px; font-weight: 700; border-radius: 8px; cursor: pointer; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="no-print">
+    <button class="print-btn" onclick="window.print()">🖨️ Print Prescription / Save as PDF</button>
+  </div>
+  <div class="header">
+    <div>
+      <span class="badge">Government of Punjab • Telemedicine Network</span>
+      <h1 class="hospital">SEHAT Nabha Telemedicine Centre</h1>
+      <p class="sub">Empanelled with SDH Civil Hospital Nabha & Rajindra Govt Hospital Patiala</p>
+    </div>
+    <div style="text-align: right;">
+      <p style="margin: 0; font-weight: 700; color: #0f172a;">Dr. Gurpreet Singh, MD</p>
+      <p class="sub">Senior Cardiologist & General Physician</p>
+      <p class="sub">Reg # PB-MCI-12345</p>
+    </div>
+  </div>
 
-DOCTOR ADVICE:
-${advice}
-================================================
-Digitally Signed & Certified via SEHAT Provider Network.
-`;
+  <div class="patient-box">
+    <div><span class="section-title">Patient Name</span><br><strong>${selectedPatient.name}</strong></div>
+    <div><span class="section-title">Age / Gender</span><br>${selectedPatient.age} Yrs / ${selectedPatient.gender}</div>
+    <div><span class="section-title">Date</span><br>${dateStr}</div>
+    <div><span class="section-title">Chief Complaint</span><br>${selectedPatient.complaint}</div>
+  </div>
+
+  <div class="rx-symbol">℞</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Medicine & Strength</th>
+        <th>Dosage</th>
+        <th>Frequency</th>
+        <th>Duration</th>
+        <th>Generic Store Guidance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>${medication}</strong></td>
+        <td>${dosage}</td>
+        <td>${frequency}</td>
+        <td>${durationDays} Days</td>
+        <td style="color: #059669; font-weight: 600;">Available at Jan Aushadhi Kendra, Nabha (up to 80% savings)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Doctor's Advice & Instructions</div>
+  <div class="advice-box">
+    ${advice}
+  </div>
+
+  <div class="footer">
+    <div>
+      <p style="margin: 0 0 4px;"><strong>National Health Helpline:</strong> 108 (Ambulance) • 104 (Health Advice)</p>
+      <p style="margin: 0;">Ayushman Bharat Mukh Mantri Sehat Bima Yojana (MMSBY) Empanelled</p>
+    </div>
+    <div class="seal">
+      ✓ DIGITALLY SIGNED & VERIFIED<br>
+      <span style="font-family: monospace; font-size: 12px;">${signatureCode}</span>
+    </div>
+  </div>
+</body>
+</html>`;
 
     // Save Rx to SQLite Database for Patient ID 1
     await createHealthRecord({
@@ -112,14 +185,27 @@ Digitally Signed & Certified via SEHAT Provider Network.
       name: `Digital Rx: ${medication}`,
       type: "Prescription",
       date: new Date().toISOString().split("T")[0],
-      doctor: "Dr. Rajesh Sharma, MD",
-      content: rxContent,
+      doctor: "Dr. Gurpreet Singh, MD",
+      content: `Prescribed: ${medication} (${dosage}, ${frequency} for ${durationDays} days). Advice: ${advice}. Verification: ${signatureCode}`,
     });
+
+    // Open clean print preview window and offer download
+    const blob = new Blob([htmlDoc], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const printWindow = window.open(url, '_blank');
+    if (!printWindow) {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Prescription_${selectedPatient.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.html`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
 
     setRxModalOpen(false);
     toast({
-      title: "Digital Prescription Generated! 📝",
-      description: `Rx saved to ${selectedPatient.name}'s Medical Vault.`,
+      title: "Digital Prescription Issued! 📝",
+      description: `Official printable Rx generated for ${selectedPatient.name} and saved to Medical Vault.`,
     });
   };
 
@@ -137,8 +223,9 @@ Digitally Signed & Certified via SEHAT Provider Network.
               <StatusBadge variant="amber">Dr. Provider Portal</StatusBadge>
             </div>
             <h1 className="font-display text-3xl sm:text-5xl text-[var(--text-primary)]">
-              Dr. Rajesh Sharma, <span className="text-gradient-warm">MD</span>
+              Dr. Gurpreet Singh, <span className="text-gradient-warm">MD</span>
             </h1>
+            <p className="text-xs text-[var(--text-muted)]">Cardiologist & General Physician • Rajindra Hospital Patiala / SDH Civil Hospital Nabha • Lic #PB-MCI-12345</p>
             <p className="text-xs text-[var(--text-muted)] font-mono">Senior Cardiologist • Reg #PB-98765 • Active Standby</p>
           </div>
 
@@ -205,14 +292,14 @@ Digitally Signed & Certified via SEHAT Provider Network.
 
               <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
                 <Link
-                  href={`/video-call/doc-001`}
+                  href={`/video-call/1`}
                   className="flex-1 lg:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl bg-[var(--accent-cyan)]/15 border border-[var(--accent-cyan)]/30 px-3.5 py-2 text-xs font-bold text-[var(--accent-cyan)] hover:bg-[var(--accent-cyan)]/25"
                 >
                   <Video size={14} /> Join Video
                 </Link>
 
                 <Link
-                  href={`/doctor-chat/doc-001`}
+                  href={`/doctor-chat/1`}
                   className="flex-1 lg:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border)] px-3.5 py-2 text-xs font-bold text-[var(--text-primary)] hover:bg-white/5"
                 >
                   <MessageSquare size={14} /> Review Chat
@@ -221,7 +308,6 @@ Digitally Signed & Certified via SEHAT Provider Network.
                 <button
                   onClick={() => {
                     grantCallPermission("1", "1");
-                    grantCallPermission("doc-001", "1");
                     toast({
                       title: "Call Permission Granted! 🔓",
                       description: `Granted Video & Voice call request permission to ${patient.name}.`,

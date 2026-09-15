@@ -3,7 +3,17 @@ import { DatabaseSync } from 'node:sqlite';
 import path from 'path';
 import fs from 'fs';
 
-const dbPath = path.join(process.cwd(), 'sehat.db');
+/**
+ * Vercel serverless functions run on a read-only filesystem at the project root.
+ * When VERCEL=1 is set (injected automatically by Vercel), we use /tmp which
+ * is writable but ephemeral — the DB is re-seeded from JSON on each cold start.
+ * In local dev and other environments, the DB lives at project root as usual.
+ */
+const isVercel = process.env.VERCEL === '1';
+const dbPath = isVercel
+  ? '/tmp/sehat.db'
+  : path.join(process.cwd(), 'sehat.db');
+
 const db = new DatabaseSync(dbPath);
 
 // Initialize schema
@@ -17,7 +27,12 @@ db.exec(`
     dob TEXT,
     gender TEXT,
     aadhaar TEXT,
-    address TEXT
+    address TEXT,
+    bloodGroup TEXT,
+    allergies TEXT,
+    chronicConditions TEXT,
+    sehatCardNo TEXT,
+    emergencyContact TEXT
   );
 
   CREATE TABLE IF NOT EXISTS doctors (
@@ -34,7 +49,9 @@ db.exec(`
     email TEXT UNIQUE NOT NULL,
     password TEXT,
     licenseNumber TEXT,
-    phone TEXT
+    phone TEXT,
+    hospital TEXT,
+    location TEXT
   );
 
   CREATE TABLE IF NOT EXISTS appointments (
@@ -112,7 +129,28 @@ db.exec(`
     location TEXT NOT NULL,
     timestamp TEXT NOT NULL
   );
+  CREATE TABLE IF NOT EXISTS vitals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER NOT NULL,
+    heartRate INTEGER NOT NULL,
+    systolic INTEGER NOT NULL,
+    diastolic INTEGER NOT NULL,
+    spO2 INTEGER NOT NULL,
+    bloodGlucose INTEGER NOT NULL,
+    recordedAt TEXT NOT NULL
+  );
 `);
+
+// Migration: Add medical profile & doctor location columns if they don't exist
+const medicalCols = ['bloodGroup', 'allergies', 'chronicConditions', 'sehatCardNo', 'emergencyContact', 'emergencyContactName', 'emergencyContactPhone'];
+for (const col of medicalCols) {
+  try { db.exec(`ALTER TABLE users ADD COLUMN ${col} TEXT`); } catch (_) { /* column already exists */ }
+}
+
+const doctorCols = ['hospital', 'location'];
+for (const col of doctorCols) {
+  try { db.exec(`ALTER TABLE doctors ADD COLUMN ${col} TEXT`); } catch (_) { /* column already exists */ }
+}
 
 // Seed initial data from JSON files if tables are empty
 function seedIfEmpty() {
@@ -136,16 +174,16 @@ function seedIfEmpty() {
     const demoUser = db.prepare('SELECT id FROM users WHERE email = ?').get('user@example.com');
     if (!demoUser) {
       db.prepare(
-        'INSERT INTO users (email, fullName, password, phone, dob, gender, aadhaar, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-      ).run('user@example.com', 'Jane Smith', 'user123', '9876543210', '1990-05-15', 'Female', '123456789012', 'Model Town, Nabha');
+        'INSERT INTO users (email, fullName, password, phone, dob, gender, aadhaar, address, bloodGroup, allergies, chronicConditions, sehatCardNo, emergencyContact) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      ).run('user@example.com', 'Harjinder Singh', 'user123', '9876543210', '1988-08-15', 'Male', '123456789012', 'Model Town, Nabha, Punjab', 'O+', 'Penicillin', 'Type 2 Diabetes', 'PB-SEHAT-99481', 'Gurpreet Kaur (+91 98145 00112)');
     }
 
     // Ensure Demo Doctor User exists
     const demoDoctor = db.prepare('SELECT id FROM doctors WHERE email = ?').get('doctor@example.com');
     if (!demoDoctor) {
       db.prepare(
-        'INSERT INTO doctors (fullName, specialty, experience, rating, reviews, avatar, dataAiHint, available, consultationFee, email, password, licenseNumber, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-      ).run('Dr. Rajesh Sharma', 'Cardiologist', 15, 4.9, 128, 'https://picsum.photos/seed/doctor-1/200/200', 'doctor avatar', 1, 500, 'doctor@example.com', 'doc123', 'PB-98765', '9811122233');
+        'INSERT INTO doctors (fullName, specialty, experience, rating, reviews, avatar, dataAiHint, available, consultationFee, email, password, licenseNumber, phone, hospital, location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      ).run('Dr. Gurpreet Singh', 'Cardiologist', 14, 4.9, 187, 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=400&auto=format&fit=crop', 'doctor portrait', 1, 500, 'doctor@example.com', 'doc123', 'PB-MCI-12345', '9814511201', 'Rajindra Hospital, Patiala', 'Patiala, Punjab');
     }
 
     // Seed Doctors
@@ -155,7 +193,7 @@ function seedIfEmpty() {
       if (fs.existsSync(doctorsFile)) {
         const data = JSON.parse(fs.readFileSync(doctorsFile, 'utf-8'));
         const insertDoctor = db.prepare(
-          'INSERT INTO doctors (id, fullName, specialty, experience, rating, reviews, avatar, dataAiHint, available, consultationFee, email, password, licenseNumber, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+          'INSERT INTO doctors (id, fullName, specialty, experience, rating, reviews, avatar, dataAiHint, available, consultationFee, email, password, licenseNumber, phone, hospital, location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         for (const d of data) {
           insertDoctor.run(
@@ -172,7 +210,9 @@ function seedIfEmpty() {
             d.email,
             d.password || '',
             d.licenseNumber || '',
-            d.phone || ''
+            d.phone || '',
+            d.hospital || '',
+            d.location || ''
           );
         }
       }
@@ -210,12 +250,21 @@ function seedIfEmpty() {
       const hrFile = path.join(process.cwd(), 'src/lib/data/health-records.json');
       if (fs.existsSync(hrFile)) {
         const data = JSON.parse(fs.readFileSync(hrFile, 'utf-8'));
-        const recordsList = Array.isArray(data) ? data : (data && typeof data === 'object' && Array.isArray(data.records) ? data.records : []);
+        let recordsList: any[] = [];
+        if (Array.isArray(data)) {
+          recordsList = data;
+        } else if (data && typeof data === 'object') {
+          if (Array.isArray(data.records)) {
+            recordsList = data.records;
+          } else if (data.records && typeof data.records === 'object') {
+            recordsList = Object.values(data.records).flat();
+          }
+        }
         const insertHr = db.prepare(
           'INSERT INTO health_records (id, userId, name, type, date, doctor, content) VALUES (?, ?, ?, ?, ?, ?, ?)'
         );
         for (const r of recordsList) {
-          insertHr.run(r.id, r.userId, r.name, r.type, r.date, r.doctor, r.content || '');
+          insertHr.run(r.id, r.userId || 1, r.name, r.type, r.date, r.doctor, r.content || data.sampleReportContents?.[r.id] || '');
         }
       }
     }

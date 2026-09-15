@@ -15,13 +15,7 @@ import {
 import { SectionHeader, StatCard, StatusBadge, Modal } from "@/components/primitives";
 import { getHealthRecords, createHealthRecord, type HealthRecord } from "@/lib/services/health-records";
 import { useToast } from "@/hooks/use-toast";
-
-function getSession() {
-  if (typeof window === 'undefined') return null;
-  const patientSession = localStorage.getItem('sehat-session-patient');
-  if (patientSession) return { type: 'patient', ...JSON.parse(patientSession) };
-  return null;
-}
+import { getSession } from "@/lib/session";
 
 export default function HealthRecordsPage() {
   const [records, setRecords] = useState<HealthRecord[]>([]);
@@ -30,12 +24,14 @@ export default function HealthRecordsPage() {
   const [labModalOpen, setLabModalOpen] = useState(false);
   const [labTestName, setLabTestName] = useState("Complete Blood Count (CBC)");
   const [userId, setUserId] = useState<number | null>(null);
+  const [patientName, setPatientName] = useState<string>("Harjinder Singh");
   const { toast } = useToast();
 
   useEffect(() => {
     const session = getSession();
     if (session?.type === 'patient') {
       setUserId(session.userId || 1);
+      if (session.fullName) setPatientName(session.fullName);
     }
   }, []);
 
@@ -53,29 +49,79 @@ export default function HealthRecordsPage() {
   const filtered = category === "All" ? records : records.filter(r => r.type === category);
 
   const downloadRecord = (rec: HealthRecord) => {
-    const content = rec.content || `================================================
-          NABHA TELEMEDICINE (SEHAT)
-             DIGITAL HEALTH RECORD
-================================================
-Record Name: ${rec.name}
-Category:    ${rec.type}
-Date:        ${rec.date}
-Provider:    ${rec.doctor}
+    const dateStr = rec.date || new Date().toISOString().split("T")[0];
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SEHAT Health Record — ${rec.name}</title>
+  <style>
+    @page { size: A4; margin: 20mm; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1e293b; line-height: 1.6; margin: 0; padding: 24px; background: #fff; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0284c7; padding-bottom: 16px; margin-bottom: 24px; }
+    .hospital { font-size: 24px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0; }
+    .sub { font-size: 13px; color: #64748b; margin: 0; }
+    .badge { display: inline-block; background: #e0f2fe; color: #0284c7; font-weight: 700; font-size: 11px; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .record-box { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 24px; font-size: 13px; }
+    .section-title { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+    .content-box { background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #0284c7; border-radius: 8px; padding: 20px; font-family: monospace; font-size: 13px; white-space: pre-wrap; line-height: 1.8; color: #1e293b; margin-bottom: 24px; }
+    .footer { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 32px; font-size: 11px; color: #94a3b8; }
+    .seal { border: 2px dashed #0284c7; border-radius: 8px; padding: 10px 16px; font-weight: 700; color: #0284c7; text-align: center; display: inline-block; }
+    .no-print { margin-bottom: 20px; }
+    .print-btn { background: #0284c7; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 700; font-size: 13px; cursor: pointer; }
+    .print-btn:hover { background: #0369a1; }
+    @media print { .no-print { display: none !important; } body { padding: 0; } }
+  </style>
+</head>
+<body>
+  <div class="no-print">
+    <button class="print-btn" onclick="window.print()">🖨️ Print Clinical Record / Save as PDF</button>
+  </div>
+  <div class="header">
+    <div>
+      <span class="badge">Department of Health & Family Welfare • Punjab</span>
+      <h1 class="hospital">SEHAT Nabha Digital Health Record</h1>
+      <p class="sub">Empanelled with Civil Hospital Nabha (SDH) & Rajindra Hospital Patiala</p>
+    </div>
+    <div style="text-align: right;">
+      <p style="margin: 0; font-weight: 700; color: #0f172a;">${rec.doctor}</p>
+      <p class="sub">Category: ${rec.type}</p>
+      <p class="sub">Record ID: #SEHAT-REC-${rec.id || '001'}</p>
+    </div>
+  </div>
 
-DETAILS / CONTENT:
-${rec.content || 'Official digital health record stored securely in SEHAT Medical Vault.'}
-================================================
-`;
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  <div class="record-box">
+    <div><span class="section-title">Patient Name</span><br><strong>${patientName}</strong></div>
+    <div><span class="section-title">Record Type</span><br><strong>${rec.type}</strong></div>
+    <div><span class="section-title">Date of Record</span><br>${dateStr}</div>
+    <div><span class="section-title">Healthcare Provider</span><br>${rec.doctor}</div>
+  </div>
+
+  <div class="section-title" style="margin-bottom: 8px;">Clinical Summary & Findings</div>
+  <div class="content-box">${rec.content || 'Official digital health record stored securely in SEHAT Medical Vault.'}</div>
+
+  <div class="footer">
+    <div>
+      <p style="margin: 0 0 4px 0;">Ayushman Bharat Digital Mission (ABDM) Compliant Record</p>
+      <p style="margin: 0;">Verified on SEHAT Telemedicine Platform · Nabha, Punjab</p>
+    </div>
+    <div class="seal">
+      VERIFIED CLINICAL ARCHIVE<br>SEHAT NABHA VAULT
+    </div>
+  </div>
+</body>
+</html>`;
+
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `Sehat_Record_${rec.name.replace(/\s+/g, '_')}.txt`;
+    link.download = `Sehat_Record_${rec.name.replace(/\s+/g, '_')}.html`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast({ title: "Downloaded Record", description: `Saved ${rec.name} to your device.` });
+    toast({ title: "Clinical Record Downloaded! 📄", description: `Saved official report for ${rec.name}. Ready to print or view in browser.` });
   };
 
   const handleBookLabTest = async (e: React.FormEvent) => {
@@ -246,11 +292,14 @@ ${rec.content || 'Official digital health record stored securely in SEHAT Medica
               onChange={(e) => setLabTestName(e.target.value)}
               className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--accent-amber)] focus:outline-none"
             >
+              <option value="HbA1c + Fasting Blood Glucose (Diabetes Panel)">HbA1c + Fasting Blood Glucose (Diabetes Panel)</option>
+              <option value="Dengue NS1 Antigen + Platelet Count (CBC)">Dengue NS1 Antigen + Platelet Count (CBC)</option>
+              <option value="Widal Test + Blood Culture (Typhoid Panel)">Widal Test + Blood Culture (Typhoid Panel)</option>
+              <option value="Anti-HCV Antibodies (Hepatitis C Screening)">Anti-HCV Antibodies (Hepatitis C Screening)</option>
+              <option value="Serum Creatinine + Urine Protein (Kidney Panel)">Serum Creatinine + Urine Protein (Kidney Panel)</option>
+              <option value="Lipid Profile + Cardiac Biomarkers">Lipid Profile + Cardiac Biomarkers</option>
               <option value="Complete Blood Count (CBC)">Complete Blood Count (CBC)</option>
-              <option value="Lipid Profile (Cholesterol)">Lipid Profile (Cholesterol)</option>
-              <option value="HbA1c Diabetes Screening">HbA1c Diabetes Screening</option>
-              <option value="Thyroid Function Test (T3/T4/TSH)">Thyroid Function Test (T3/T4/TSH)</option>
-              <option value="Liver Function Test (LFT)">Liver Function Test (LFT)</option>
+              <option value="Thyroid Profile (T3, T4, TSH)">Thyroid Profile (T3, T4, TSH)</option>
             </select>
           </div>
 

@@ -20,136 +20,97 @@ import {
   Zap,
   Globe,
   Lock,
+  Building2,
+  Phone,
+  Clock,
+  CheckCircle2,
+  MapPin,
+  HeartPulse,
+  Award,
 } from "lucide-react";
 import { Modal } from "@/components/primitives";
 import { useToast } from "@/hooks/use-toast";
 import { loginPatient, loginDoctor, registerPatient } from "@/lib/services/user";
 
 /* ══════════════════════════════════════════════════════════════
-   ANIMATED VITALS CARD (hero visual)
+   HERO INTERACTIVE PATIENT & DOCTOR CARD PREVIEW
 ══════════════════════════════════════════════════════════════ */
 
-function VitalsCard() {
+function HeroCareCard() {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40, rotateX: 8 }}
-      animate={{ opacity: 1, y: 0, rotateX: 0 }}
-      transition={{ duration: 1, ease: [0.23, 1, 0.32, 1], delay: 0.4 }}
-      className="relative w-full max-w-sm"
-      style={{ perspective: "1000px" }}
+      initial={{ opacity: 0, y: 30, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: 0.3 }}
+      className="relative w-full max-w-md space-y-4"
     >
-      {/* Outer glow ring */}
+      {/* Background glow */}
       <div
         className="absolute inset-0 rounded-3xl"
         style={{
-          background: "linear-gradient(135deg, rgba(99,102,241,0.3), rgba(34,211,238,0.2), rgba(168,85,247,0.15))",
-          filter: "blur(20px)",
-          transform: "scale(1.08)",
+          background: "linear-gradient(135deg, rgba(99,102,241,0.25), rgba(34,211,238,0.2), rgba(16,185,129,0.15))",
+          filter: "blur(24px)",
+          transform: "scale(1.05)",
         }}
       />
 
+      {/* Main Doctor Preview Card */}
       <div
-        className="relative rounded-3xl p-6"
+        className="relative rounded-3xl p-6 space-y-4"
         style={{
-          background: "rgba(10,10,24,0.85)",
+          background: "rgba(11,15,25,0.9)",
           backdropFilter: "blur(24px)",
-          border: "1px solid rgba(99,102,241,0.25)",
-          boxShadow: "0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          boxShadow: "0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)",
         }}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <p
-              className="text-[10px] uppercase tracking-[0.2em] font-bold mb-0.5"
-              style={{ color: "var(--text-muted)" }}
-            >
-              Live Biometric Scan
-            </p>
-            <p
-              className="font-display text-base"
-              style={{ color: "var(--text-primary)" }}
-            >
-              Simran Kaur
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="glow-dot-green" />
-            <span className="text-[10px] font-semibold" style={{ color: "var(--accent-emerald)" }}>
-              LIVE
-            </span>
-          </div>
-        </div>
-
-        {/* ECG Wave */}
-        <div
-          className="relative h-20 overflow-hidden rounded-xl mb-5"
-          style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.05)" }}
-        >
-          <svg viewBox="0 0 300 80" className="h-full w-full" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="ecgGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#22d3ee" stopOpacity="0" />
-                <stop offset="30%" stopColor="#22d3ee" stopOpacity="1" />
-                <stop offset="100%" stopColor="#6366f1" stopOpacity="0.6" />
-              </linearGradient>
-            </defs>
-            <motion.path
-              d="M0,40 L40,40 L55,15 L70,65 L85,40 L110,40 L120,25 L135,55 L150,40 L300,40"
-              fill="none"
-              stroke="url(#ecgGrad)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            />
-          </svg>
-          <div
-            className="absolute inset-0 rounded-xl"
-            style={{
-              background: "linear-gradient(to right, rgba(34,211,238,0.04), transparent)",
-            }}
-          />
-        </div>
-
-        {/* Vitals Grid */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { value: "72", unit: "BPM", color: "#22d3ee", label: "Heart Rate" },
-            { value: "99%", unit: "SpO2", color: "#10b981", label: "Oxygen" },
-            { value: "120/80", unit: "mmHg", color: "#6366f1", label: "Blood Press." },
-          ].map((v) => (
-            <div
-              key={v.unit}
-              className="rounded-xl p-2.5 text-center"
-              style={{
-                background: `${v.color}0f`,
-                border: `1px solid ${v.color}25`,
-              }}
-            >
-              <p className="text-lg font-black leading-none" style={{ color: v.color }}>
-                {v.value}
-              </p>
-              <p
-                className="text-[9px] font-bold uppercase tracking-wider mt-1"
-                style={{ color: "var(--text-muted)" }}
-              >
-                {v.unit}
-              </p>
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3.5">
+            <div className="relative">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white font-extrabold text-xl shadow-lg">
+                G
+              </div>
+              <span className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-[#0b0f19] bg-emerald-500" />
             </div>
-          ))}
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-extrabold text-base text-[var(--text-primary)]">Dr. Gurpreet Singh</h3>
+                <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+                  Online
+                </span>
+              </div>
+              <p className="text-xs font-semibold text-[var(--accent-cyan)]">Senior Cardiologist & Physician</p>
+              <p className="text-[11px] text-[var(--text-muted)] mt-0.5">Rajindra Govt Hospital, Patiala · Lic #PB-MCI-12345</p>
+            </div>
+          </div>
         </div>
 
-        {/* AI Badge */}
-        <div
-          className="mt-4 flex items-center gap-2 rounded-xl p-2.5"
-          style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}
-        >
-          <Brain size={14} style={{ color: "#818cf8" }} />
-          <span className="text-[11px] font-semibold" style={{ color: "#818cf8" }}>
-            Gemini AI: All vitals within normal range
+        <div className="grid grid-cols-3 gap-2.5 rounded-2xl bg-[#080b12] p-3 border border-[var(--border)] text-center">
+          <div>
+            <p className="text-[10px] uppercase font-bold text-[var(--text-muted)]">Experience</p>
+            <p className="text-xs font-black text-[var(--text-primary)] mt-0.5">14 Years</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase font-bold text-[var(--text-muted)]">Rating</p>
+            <p className="text-xs font-black text-amber-400 mt-0.5">4.9 ⭐ (187)</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase font-bold text-[var(--text-muted)]">Fee</p>
+            <p className="text-xs font-black text-emerald-400 mt-0.5">₹500</p>
+          </div>
+        </div>
+
+        {/* Live Patient Sehat Card Badge */}
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xl">🦁</span>
+            <div>
+              <p className="text-[11px] font-bold text-emerald-400">Punjab Sehat Card (MMSBY)</p>
+              <p className="text-[10px] text-[var(--text-muted)]">Cashless Care up to ₹10 Lakhs</p>
+            </div>
+          </div>
+          <span className="text-xs font-mono font-bold text-white bg-black/40 px-2.5 py-1 rounded-lg border border-emerald-500/30">
+            ACTIVE
           </span>
         </div>
       </div>
@@ -158,7 +119,7 @@ function VitalsCard() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   AUTH MODAL (all logic preserved)
+   AUTHENTICATION MODAL
 ══════════════════════════════════════════════════════════════ */
 
 function AuthModal({
@@ -198,358 +159,312 @@ function AuthModal({
     aadhaar: "",
     address: "",
   });
-  const [regErrors, setRegErrors] = useState<Record<string, string>>({});
+  const [regError, setRegError] = useState("");
   const [regLoading, setRegLoading] = useState(false);
 
-  useEffect(() => { setTab(initialTab); }, [initialTab]);
+  useEffect(() => {
+    setTab(initialTab);
+    setPError("");
+    setDError("");
+    setRegError("");
+  }, [initialTab, open]);
 
-  async function submitPatientLogin(e: React.FormEvent) {
+  const handlePatientLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setPError("");
     setPLoading(true);
-    const res = await loginPatient(pEmail, pPass);
-    setPLoading(false);
-    if (!res.ok || !res.user) return setPError(res.error || "Login failed");
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "sehat-session-patient",
-        JSON.stringify({
-          type: "patient",
-          userId: res.user.id,
-          email: res.user.email,
-          fullName: res.user.fullName,
-          phone: res.user.phone,
-          dob: res.user.dob,
-          gender: res.user.gender,
-          aadhaar: res.user.aadhaar,
-          address: res.user.address,
-        })
-      );
+    try {
+      const res = await loginPatient(pEmail, pPass);
+      if (res.ok && res.user) {
+        localStorage.setItem("sehat-session-patient", JSON.stringify({ userId: res.user.id, ...res.user }));
+        toast({ title: "Welcome back!", description: `Logged in as ${res.user.fullName}` });
+        onClose();
+        router.push("/dashboard");
+      } else {
+        setPError(res.error || "Login failed");
+      }
+    } catch {
+      setPError("An error occurred during authentication.");
+    } finally {
+      setPLoading(false);
     }
-    toast({ title: "Welcome back!", description: "Redirecting to your patient dashboard." });
-    onClose();
-    router.push("/dashboard");
-  }
+  };
 
-  async function submitDoctorLogin(e: React.FormEvent) {
+  const handleDoctorLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setDError("");
     setDLoading(true);
-    const res = await loginDoctor(dEmail, dPass);
-    setDLoading(false);
-    if (!res.ok || !res.doctor) return setDError(res.error || "Login failed");
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "sehat-session-doctor",
-        JSON.stringify({
-          type: "doctor",
-          doctorId: res.doctor.id,
-          email: res.doctor.email,
-          fullName: res.doctor.fullName,
-          specialty: res.doctor.specialty,
-        })
-      );
+    try {
+      const res = await loginDoctor(dEmail, dPass);
+      if (res.ok && res.doctor) {
+        localStorage.setItem("sehat-session-doctor", JSON.stringify({ doctorId: res.doctor.id, ...res.doctor }));
+        toast({ title: "Welcome Doctor!", description: `Logged in as ${res.doctor.fullName}` });
+        onClose();
+        router.push("/doctor/dashboard");
+      } else {
+        setDError(res.error || "Doctor login failed");
+      }
+    } catch {
+      setDError("An error occurred during authentication.");
+    } finally {
+      setDLoading(false);
     }
-    toast({ title: "Welcome Dr.!", description: "Redirecting to your doctor command center." });
-    onClose();
-    router.push("/doctor/dashboard");
-  }
+  };
 
-  async function submitRegister(e: React.FormEvent) {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRegErrors({});
-    const errs: Record<string, string> = {};
-    if (!reg.fullName.trim()) errs.fullName = "Full name required";
-    if (!reg.email.includes("@")) errs.email = "Valid email required";
-    if (reg.password.length < 4) errs.password = "Min 4 characters";
-    if (Object.keys(errs).length > 0) return setRegErrors(errs);
-
-    setRegLoading(true);
-    const res = await registerPatient(reg);
-    setRegLoading(false);
-    if (!res.ok || !res.user) return setRegErrors({ form: res.error || "Registration failed" });
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "sehat-session-patient",
-        JSON.stringify({
-          type: "patient",
-          userId: res.user.id,
-          email: res.user.email,
-          fullName: res.user.fullName,
-          phone: res.user.phone,
-          dob: res.user.dob,
-          gender: res.user.gender,
-          aadhaar: res.user.aadhaar,
-          address: res.user.address,
-        })
-      );
+    setRegError("");
+    if (!reg.fullName || !reg.email || !reg.password) {
+      setRegError("Please fill in all required fields.");
+      return;
     }
-    toast({ title: "Account Created!", description: "Logging you in directly." });
-    onClose();
-    router.push("/dashboard");
-  }
-
-  const inputStyle: React.CSSProperties = {
-    width: "100%",
-    borderRadius: "10px",
-    border: "1px solid var(--border-bright)",
-    background: "var(--surface-3)",
-    padding: "10px 14px",
-    fontSize: "0.875rem",
-    color: "var(--text-primary)",
-    outline: "none",
-    transition: "border-color 200ms ease, box-shadow 200ms ease",
-    marginTop: "4px",
+    setRegLoading(true);
+    try {
+      const res = await registerPatient(reg);
+      if (res.ok && res.user) {
+        localStorage.setItem("sehat-session-patient", JSON.stringify({ userId: res.user.id, ...res.user }));
+        toast({ title: "Registration Successful! 🎉", description: `Account created for ${res.user.fullName}` });
+        onClose();
+        router.push("/dashboard");
+      } else {
+        setRegError(res.error || "Registration failed");
+      }
+    } catch {
+      setRegError("Failed to register. Please try again.");
+    } finally {
+      setRegLoading(false);
+    }
   };
-
-  const labelStyle: React.CSSProperties = {
-    fontSize: "10px",
-    fontWeight: 700,
-    textTransform: "uppercase",
-    letterSpacing: "0.12em",
-    color: "var(--text-muted)",
-  };
-
-  const tabs = [
-    { key: "patient", label: "Patient Login", color: "#6366f1", bg: "rgba(99,102,241,0.12)" },
-    { key: "doctor", label: "Doctor Portal", color: "#f59e0b", bg: "rgba(245,158,11,0.12)" },
-    { key: "register", label: "New Account", color: "#10b981", bg: "rgba(16,185,129,0.12)" },
-  ] as const;
 
   return (
-    <Modal open={open} onClose={onClose} maxWidth="max-w-md">
-      {/* Tab Switcher */}
-      <div
-        className="flex gap-1 p-1 rounded-xl mb-5"
-        style={{ background: "var(--surface-3)" }}
-      >
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className="flex-1 py-2 text-xs font-bold rounded-lg transition-all"
-            style={
-              tab === t.key
-                ? { background: t.bg, color: t.color, boxShadow: `0 0 12px ${t.bg}` }
-                : { color: "var(--text-muted)" }
-            }
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Patient Login */}
-      {tab === "patient" && (
-        <motion.form
-          key="patient"
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.2 }}
-          onSubmit={submitPatientLogin}
-          className="space-y-4"
-        >
-          <div>
-            <label style={labelStyle}>Patient Email</label>
-            <input
-              type="email"
-              value={pEmail}
-              onChange={(e) => setPEmail(e.target.value)}
-              style={inputStyle}
-              required
-              onFocus={(e) => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px rgba(99,102,241,0.15)"; }}
-              onBlur={(e) => { e.target.style.borderColor = "var(--border-bright)"; e.target.style.boxShadow = "none"; }}
-            />
+    <Modal open={open} onClose={onClose} maxWidth="max-w-lg">
+      <div className="space-y-6">
+        {/* Modal Header */}
+        <div className="text-center space-y-1">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white font-black shadow-lg mb-2">
+            <Stethoscope size={22} />
           </div>
-          <div>
-            <label style={labelStyle}>Password</label>
-            <div className="relative" style={{ marginTop: 4 }}>
-              <input
-                type={pShowPass ? "text" : "password"}
-                value={pPass}
-                onChange={(e) => setPPass(e.target.value)}
-                style={{ ...inputStyle, marginTop: 0, paddingRight: "40px" }}
-                required
-                onFocus={(e) => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px rgba(99,102,241,0.15)"; }}
-                onBlur={(e) => { e.target.style.borderColor = "var(--border-bright)"; e.target.style.boxShadow = "none"; }}
-              />
-              <button
-                type="button"
-                onClick={() => setPShowPass(!pShowPass)}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-                style={{ color: "var(--text-muted)" }}
-              >
-                {pShowPass ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
+          <h2 className="font-display text-2xl text-[var(--text-primary)]">
+            SEHAT <span className="text-gradient">Nabha</span>
+          </h2>
+          <p className="text-xs text-[var(--text-muted)]">Access your healthcare portal & medical vault</p>
+        </div>
 
-          {pError && (
-            <p className="text-xs font-semibold" style={{ color: "var(--accent-red)" }}>
-              ⚠ {pError}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={pLoading}
-            className="w-full rounded-xl py-3 text-sm font-bold text-white transition-all"
-            style={{
-              background: "linear-gradient(135deg, #6366f1, #22d3ee)",
-              boxShadow: "0 8px 24px rgba(99,102,241,0.4)",
-              opacity: pLoading ? 0.7 : 1,
-            }}
-          >
-            {pLoading ? "Signing in…" : "Sign In as Patient →"}
-          </button>
-        </motion.form>
-      )}
-
-      {/* Doctor Login */}
-      {tab === "doctor" && (
-        <motion.form
-          key="doctor"
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.2 }}
-          onSubmit={submitDoctorLogin}
-          className="space-y-4"
-        >
-          <div>
-            <label style={labelStyle}>Doctor Email</label>
-            <input
-              type="email"
-              value={dEmail}
-              onChange={(e) => setDEmail(e.target.value)}
-              style={inputStyle}
-              required
-              onFocus={(e) => { e.target.style.borderColor = "#f59e0b"; e.target.style.boxShadow = "0 0 0 3px rgba(245,158,11,0.15)"; }}
-              onBlur={(e) => { e.target.style.borderColor = "var(--border-bright)"; e.target.style.boxShadow = "none"; }}
-            />
-          </div>
-          <div>
-            <label style={labelStyle}>Password</label>
-            <input
-              type="password"
-              value={dPass}
-              onChange={(e) => setDPass(e.target.value)}
-              style={inputStyle}
-              required
-              onFocus={(e) => { e.target.style.borderColor = "#f59e0b"; e.target.style.boxShadow = "0 0 0 3px rgba(245,158,11,0.15)"; }}
-              onBlur={(e) => { e.target.style.borderColor = "var(--border-bright)"; e.target.style.boxShadow = "none"; }}
-            />
-          </div>
-
-          {dError && (
-            <p className="text-xs font-semibold" style={{ color: "var(--accent-red)" }}>
-              ⚠ {dError}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={dLoading}
-            className="w-full rounded-xl py-3 text-sm font-bold text-white transition-all"
-            style={{
-              background: "linear-gradient(135deg, #f59e0b, #ef4444)",
-              boxShadow: "0 8px 24px rgba(245,158,11,0.35)",
-              opacity: dLoading ? 0.7 : 1,
-            }}
-          >
-            {dLoading ? "Signing in…" : "Sign In to Doctor Portal →"}
-          </button>
-        </motion.form>
-      )}
-
-      {/* Register */}
-      {tab === "register" && (
-        <motion.form
-          key="register"
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.2 }}
-          onSubmit={submitRegister}
-          className="space-y-3 max-h-[60vh] overflow-y-auto pr-1"
-        >
+        {/* Tab Selector */}
+        <div className="grid grid-cols-3 gap-1 rounded-2xl bg-[var(--surface-2)] p-1 border border-[var(--border)]">
           {[
-            { key: "fullName", label: "Full Name", type: "text", required: true },
-            { key: "email", label: "Email", type: "email", required: true },
-            { key: "password", label: "Password", type: "password", required: true },
-            { key: "phone", label: "Phone (optional)", type: "tel", required: false },
-          ].map((f) => (
-            <div key={f.key}>
-              <label style={labelStyle}>{f.label}</label>
-              <input
-                type={f.type}
-                value={(reg as any)[f.key]}
-                onChange={(e) => setReg({ ...reg, [f.key]: e.target.value })}
-                style={inputStyle}
-                required={f.required}
-                onFocus={(e) => { e.target.style.borderColor = "#10b981"; e.target.style.boxShadow = "0 0 0 3px rgba(16,185,129,0.15)"; }}
-                onBlur={(e) => { e.target.style.borderColor = "var(--border-bright)"; e.target.style.boxShadow = "none"; }}
-              />
-              {regErrors[f.key] && (
-                <p className="text-[11px] mt-1 font-semibold" style={{ color: "var(--accent-red)" }}>
-                  {regErrors[f.key]}
-                </p>
-              )}
-            </div>
-          ))}
-
-          {regErrors.form && (
-            <p className="text-xs font-semibold" style={{ color: "var(--accent-red)" }}>
-              ⚠ {regErrors.form}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={regLoading}
-            className="w-full rounded-xl py-3 text-sm font-bold text-white transition-all mt-1"
-            style={{
-              background: "linear-gradient(135deg, #10b981, #06b6d4)",
-              boxShadow: "0 8px 24px rgba(16,185,129,0.35)",
-              opacity: regLoading ? 0.7 : 1,
-            }}
-          >
-            {regLoading ? "Creating account…" : "Create Patient Account →"}
-          </button>
-        </motion.form>
-      )}
-
-      {/* Demo Credentials */}
-      <div
-        className="mt-5 rounded-xl p-3"
-        style={{ background: "var(--surface-3)", border: "1px solid var(--border)" }}
-      >
-        <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#818cf8" }}>
-          ⚡ Quick Demo Access
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          {[
-            { role: "Patient", email: "user@example.com", pass: "user123", color: "#818cf8" },
-            { role: "Doctor", email: "doctor@example.com", pass: "doc123", color: "#fbbf24" },
-          ].map((d) => (
-            <div
-              key={d.role}
-              className="rounded-lg p-2"
-              style={{ background: "var(--surface)", border: "1px solid var(--border-bright)" }}
+            { key: "patient", label: "Patient Sign In" },
+            { key: "doctor", label: "Doctor Portal" },
+            { key: "register", label: "New Account" },
+          ].map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setTab(t.key as any)}
+              className={`rounded-xl py-2 text-xs font-bold transition-all ${
+                tab === t.key
+                  ? "bg-[var(--accent-indigo)] text-white shadow-md"
+                  : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+              }`}
             >
-              <p className="text-[11px] font-bold" style={{ color: d.color }}>
-                {d.role}
-              </p>
-              <p className="text-[10px] mt-0.5" style={{ color: "var(--text-muted)" }}>
-                {d.email}
-              </p>
-              <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-                Pass: {d.pass}
-              </p>
-            </div>
+              {t.label}
+            </button>
           ))}
         </div>
+
+        {/* TAB 1: Patient Login */}
+        {tab === "patient" && (
+          <form onSubmit={handlePatientLogin} className="space-y-4">
+            {pError && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400 font-bold">
+                {pError}
+              </div>
+            )}
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Email Address</label>
+              <input
+                type="email"
+                value={pEmail}
+                onChange={(e) => setPEmail(e.target.value)}
+                required
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--accent-indigo)] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Password</label>
+              <div className="relative mt-1">
+                <input
+                  type={pShowPass ? "text" : "password"}
+                  value={pPass}
+                  onChange={(e) => setPPass(e.target.value)}
+                  required
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5 pr-10 text-sm text-[var(--text-primary)] focus:border-[var(--accent-indigo)] focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setPShowPass(!pShowPass)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+                >
+                  {pShowPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={pLoading}
+              className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 py-3 text-xs font-bold text-white shadow-lg shadow-indigo-500/25 hover:opacity-95 disabled:opacity-50"
+            >
+              {pLoading ? "Signing in..." : "Sign In to Patient Portal"}
+            </button>
+
+            <div className="pt-2 border-t border-[var(--border)] text-center">
+              <button
+                type="button"
+                onClick={async () => {
+                  setPLoading(true);
+                  const res = await loginPatient("user@example.com", "user123");
+                  if (res.ok && res.user) {
+                    localStorage.setItem("sehat-session-patient", JSON.stringify({ userId: res.user.id, ...res.user }));
+                    toast({ title: "Demo Patient Session Active!", description: "Logged in as Harjinder Singh" });
+                    onClose();
+                    router.push("/dashboard");
+                  }
+                  setPLoading(false);
+                }}
+                className="w-full rounded-xl border border-indigo-500/30 bg-indigo-500/10 py-2 text-xs font-bold text-indigo-300 hover:bg-indigo-500/20 transition-all"
+              >
+                ⚡ 1-Click Patient Demo Login (Harjinder Singh)
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* TAB 2: Doctor Login */}
+        {tab === "doctor" && (
+          <form onSubmit={handleDoctorLogin} className="space-y-4">
+            {dError && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400 font-bold">
+                {dError}
+              </div>
+            )}
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Doctor Email</label>
+              <input
+                type="email"
+                value={dEmail}
+                onChange={(e) => setDEmail(e.target.value)}
+                required
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--accent-indigo)] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Password</label>
+              <input
+                type="password"
+                value={dPass}
+                onChange={(e) => setDPass(e.target.value)}
+                required
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--accent-indigo)] focus:outline-none"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={dLoading}
+              className="w-full rounded-xl bg-gradient-to-r from-amber-600 to-yellow-500 py-3 text-xs font-bold text-black shadow-lg shadow-amber-500/25 hover:opacity-95 disabled:opacity-50"
+            >
+              {dLoading ? "Authenticating Doctor..." : "Access Doctor Dashboard"}
+            </button>
+
+            <div className="pt-2 border-t border-[var(--border)] text-center">
+              <button
+                type="button"
+                onClick={async () => {
+                  setDLoading(true);
+                  const res = await loginDoctor("doctor@example.com", "doc123");
+                  if (res.ok && res.doctor) {
+                    localStorage.setItem("sehat-session-doctor", JSON.stringify({ doctorId: res.doctor.id, ...res.doctor }));
+                    toast({ title: "Demo Doctor Session Active!", description: "Logged in as Dr. Gurpreet Singh, MD" });
+                    onClose();
+                    router.push("/doctor/dashboard");
+                  }
+                  setDLoading(false);
+                }}
+                className="w-full rounded-xl border border-amber-500/30 bg-amber-500/10 py-2 text-xs font-bold text-amber-300 hover:bg-amber-500/20 transition-all"
+              >
+                ⚡ 1-Click Doctor Demo Login (Dr. Gurpreet Singh)
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* TAB 3: Register */}
+        {tab === "register" && (
+          <form onSubmit={handleRegister} className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+            {regError && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400 font-bold">
+                {regError}
+              </div>
+            )}
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Full Name *</label>
+              <input
+                type="text"
+                value={reg.fullName}
+                onChange={(e) => setReg({ ...reg, fullName: e.target.value })}
+                required
+                placeholder="e.g. Harjinder Singh"
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--accent-indigo)] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Email Address *</label>
+              <input
+                type="email"
+                value={reg.email}
+                onChange={(e) => setReg({ ...reg, email: e.target.value })}
+                required
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--accent-indigo)] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Password *</label>
+              <input
+                type="password"
+                value={reg.password}
+                onChange={(e) => setReg({ ...reg, password: e.target.value })}
+                required
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--accent-indigo)] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Phone Number</label>
+              <input
+                type="text"
+                value={reg.phone}
+                onChange={(e) => setReg({ ...reg, phone: e.target.value })}
+                placeholder="+91 98145 00000"
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--accent-indigo)] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Address (Nabha Tehsil)</label>
+              <input
+                type="text"
+                value={reg.address}
+                onChange={(e) => setReg({ ...reg, address: e.target.value })}
+                placeholder="e.g. Model Town, Nabha, Punjab"
+                className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--accent-indigo)] focus:outline-none"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={regLoading}
+              className="w-full rounded-xl bg-gradient-to-r from-emerald-600 to-cyan-500 py-3 text-xs font-bold text-white shadow-lg shadow-emerald-500/25 hover:opacity-95 disabled:opacity-50 mt-2"
+            >
+              {regLoading ? "Creating Account..." : "Create Patient Account"}
+            </button>
+          </form>
+        )}
       </div>
     </Modal>
   );
@@ -560,398 +475,252 @@ function AuthModal({
 ══════════════════════════════════════════════════════════════ */
 
 export default function LandingPage() {
+  const router = useRouter();
+  const { toast } = useToast();
   const [authOpen, setAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<"patient" | "doctor" | "register">("patient");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
 
   const openModal = (tab: "patient" | "doctor" | "register") => {
     setAuthTab(tab);
     setAuthOpen(true);
   };
 
-  if (!mounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#05050f" }}>
-        <div className="flex flex-col items-center gap-4">
-          <div
-            className="w-12 h-12 rounded-full border-2 border-t-transparent animate-spin"
-            style={{ borderColor: "#6366f1", borderTopColor: "transparent" }}
-          />
-          <p className="text-xs font-semibold" style={{ color: "#64748b" }}>
-            Initializing SEHAT…
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const handleConsultationClick = () => {
+    const patientSession = typeof window !== 'undefined' ? localStorage.getItem('sehat-session-patient') : null;
+    if (patientSession) {
+      router.push('/doctor-chat');
+    } else {
+      openModal('patient');
+    }
+  };
+
+  const handleDoctorPortalClick = () => {
+    const doctorSession = typeof window !== 'undefined' ? localStorage.getItem('sehat-session-doctor') : null;
+    if (doctorSession) {
+      router.push('/doctor/dashboard');
+    } else {
+      openModal('doctor');
+    }
+  };
 
   const features = [
     {
-      icon: Sparkles,
-      title: "AI Symptom Checker",
-      desc: "Gemini 1.5 differential diagnosis with voice input & photo analysis",
-      color: "#10b981",
-      bg: "rgba(16,185,129,0.1)",
-    },
-    {
-      icon: Video,
-      title: "HD Video Consults",
-      desc: "End-to-end WebRTC encrypted video calls with verified specialists",
+      icon: Stethoscope,
+      title: "Doctor Consultations",
+      desc: "Connect with certified physicians from Rajindra Hospital Patiala & SDH Civil Hospital Nabha via WebRTC Video/Voice.",
       color: "#22d3ee",
       bg: "rgba(34,211,238,0.1)",
     },
     {
-      icon: MessageSquare,
-      title: "Instant Doctor Chat",
-      desc: "Real-time encrypted messaging with online doctors 24/7",
-      color: "#a855f7",
-      bg: "rgba(168,85,247,0.1)",
+      icon: Building2,
+      title: "Civil Hospital OPD Guide",
+      desc: "Daily schedules for all 10 departments at Lt. Gen. Shivdev Singh SDH Civil Hospital Nabha with token advice.",
+      color: "#10b981",
+      bg: "rgba(16,185,129,0.1)",
     },
     {
       icon: Pill,
-      title: "Jan Aushadhi Finder",
-      desc: "Generic drug locator with live stock alerts & pharmacy map",
+      title: "Jan Aushadhi Generic Finder",
+      desc: "Locate generic medicine inventory at local Nabha stores and calculate brand-to-generic savings up to 90%.",
       color: "#f59e0b",
       bg: "rgba(245,158,11,0.1)",
     },
     {
-      icon: ShieldCheck,
-      title: "Digital Health Vault",
-      desc: "Secure medical records, prescriptions & lab reports in one place",
-      color: "#6366f1",
-      bg: "rgba(99,102,241,0.1)",
-    },
-    {
       icon: Siren,
-      title: "108 Emergency Dispatch",
-      desc: "National ambulance dispatch with real-time GPS ETA countdown",
+      title: "108 Emergency Ambulance",
+      desc: "National ambulance dispatch with real-time GPS radar, agricultural chemical emergency guides, and helpline buttons.",
       color: "#ef4444",
       bg: "rgba(239,68,68,0.1)",
+    },
+    {
+      icon: ShieldCheck,
+      title: "Sehat Card & Health Vault",
+      desc: "Store diagnostic reports, digital e-prescriptions, and Ayushman Bharat MMSBY cashless health coverage details.",
+      color: "#a855f7",
+      bg: "rgba(168,85,247,0.1)",
+    },
+    {
+      icon: HeartPulse,
+      title: "Regional Symptom Triage",
+      desc: "Interactive diagnostic checker tuned for Punjab's health conditions supporting English, Hindi, and Gurmukhi Punjabi.",
+      color: "#6366f1",
+      bg: "rgba(99,102,241,0.1)",
     },
   ];
 
   return (
-    <div
-      className="min-h-screen text-[var(--text-primary)] overflow-x-hidden"
-      style={{
-        background: "var(--bg-root)",
-        backgroundImage:
-          "radial-gradient(ellipse 100% 60% at 20% -10%, rgba(99,102,241,0.12) 0%, transparent 55%)," +
-          "radial-gradient(ellipse 60% 40% at 80% 110%, rgba(34,211,238,0.08) 0%, transparent 50%)",
-      }}
-      suppressHydrationWarning
-    >
-      {/* ─── NAV ─────────────────────────────────────────── */}
-      <nav
-        className="sticky top-0 z-40 flex items-center justify-between px-6 py-4"
-        style={{
-          background: "rgba(5,5,15,0.75)",
-          backdropFilter: "blur(20px) saturate(150%)",
-          WebkitBackdropFilter: "blur(20px) saturate(150%)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-        }}
-      >
+    <div className="min-h-screen bg-[#050810] text-slate-100 overflow-x-hidden font-sans" suppressHydrationWarning>
+      {/* Top Government Scheme Announcement Bar */}
+      <div className="bg-gradient-to-r from-emerald-950 via-indigo-950 to-emerald-950 border-b border-emerald-500/20 py-2.5 px-4 text-center text-xs font-bold text-emerald-300">
+        🏛️ Empanelled under Ayushman Bharat Mukh Mantri Sehat Bima Yojana (MMSBY) · Cashless Treatment up to ₹10 Lakhs/Year
+      </div>
+
+      {/* Navigation Header */}
+      <nav className="sticky top-0 z-40 backdrop-blur-xl bg-[#050810]/80 border-b border-white/5 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div
-            className="flex h-9 w-9 items-center justify-center rounded-xl"
-            style={{
-              background: "linear-gradient(135deg, #6366f1, #22d3ee)",
-              boxShadow: "0 4px 20px rgba(99,102,241,0.5)",
-            }}
-          >
-            <Stethoscope size={17} color="white" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-white font-extrabold shadow-lg">
+            <Stethoscope size={20} />
           </div>
           <div>
-            <span className="font-display text-[17px]" style={{ color: "var(--text-primary)" }}>
-              SEHAT
-            </span>
-            <span
-              className="ml-2 text-[9px] font-bold uppercase tracking-[0.2em]"
-              style={{ color: "var(--text-muted)" }}
-            >
-              Telemedicine
-            </span>
+            <span className="font-display font-black text-xl tracking-tight text-white">SEHAT</span>
+            <span className="ml-2 text-[10px] font-extrabold uppercase tracking-widest text-cyan-400">Nabha</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => openModal("patient")}
-            className="rounded-xl px-4 py-2 text-xs font-semibold transition-all"
-            style={{
-              border: "1px solid var(--border-bright)",
-              color: "var(--text-primary)",
-            }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.05)")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "")}
+            className="rounded-xl px-4 py-2 text-xs font-bold border border-white/10 text-slate-200 hover:bg-white/5 transition-all"
           >
             Sign In
           </button>
           <button
             onClick={() => openModal("register")}
-            className="rounded-xl px-4 py-2 text-xs font-bold text-white transition-all"
-            style={{
-              background: "linear-gradient(135deg, #6366f1, #22d3ee)",
-              boxShadow: "0 4px 16px rgba(99,102,241,0.4)",
-            }}
+            className="rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-indigo-500/25 hover:opacity-95 transition-all"
           >
             Get Started →
           </button>
         </div>
       </nav>
 
-      {/* ─── HERO ─────────────────────────────────────────── */}
-      <section className="relative max-w-7xl mx-auto px-6 pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden">
-        {/* Decorative orbs */}
-        <div
-          className="absolute top-0 right-0 w-[600px] h-[600px] pointer-events-none"
-          style={{
-            background: "radial-gradient(ellipse at center, rgba(99,102,241,0.12) 0%, transparent 65%)",
-            transform: "translate(20%, -30%)",
-          }}
-        />
-        <div
-          className="absolute bottom-0 left-0 w-[400px] h-[400px] pointer-events-none"
-          style={{
-            background: "radial-gradient(ellipse at center, rgba(34,211,238,0.08) 0%, transparent 70%)",
-            transform: "translate(-30%, 30%)",
-          }}
-        />
+      {/* Hero Section */}
+      <section className="relative max-w-7xl mx-auto px-6 pt-16 pb-20 md:pt-24 md:pb-28">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-xs font-extrabold text-cyan-400">
+              <Building2 size={14} /> Local Healthcare Partner · Nabha Tehsil & Patiala District
+            </div>
 
-        {/* Dot grid */}
-        <div className="absolute inset-0 bg-dots opacity-30 pointer-events-none" />
-
-        <div className="relative grid lg:grid-cols-2 gap-14 items-center">
-          {/* Left copy */}
-          <div className="space-y-7">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-            >
-              <span
-                className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold"
-                style={{
-                  background: "rgba(16,185,129,0.1)",
-                  border: "1px solid rgba(16,185,129,0.3)",
-                  color: "#34d399",
-                }}
-              >
-                <Sparkles size={12} />
-                SEHAT Health Engine 3.0 — Powered by Gemini AI
+            <h1 className="font-display text-4xl sm:text-5xl xl:text-6xl font-black leading-tight text-white">
+              Complete Healthcare <br />
+              <span className="bg-gradient-to-r from-indigo-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">
+                for Nabha Region
               </span>
-            </motion.div>
+            </h1>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1], delay: 0.1 }}
-              className="font-display text-4xl sm:text-5xl xl:text-6xl"
-              style={{ color: "var(--text-primary)", lineHeight: 1.08 }}
-            >
-              Digital Healthcare
-              <br />
-              <span className="text-gradient">for Every Indian</span>
-            </motion.h1>
+            <p className="text-slate-400 text-sm sm:text-base leading-relaxed max-w-xl">
+              Connect with certified doctors from Rajindra Hospital Patiala & SDH Civil Hospital Nabha, locate Jan Aushadhi generic stores, and manage your family's health records in one place.
+            </p>
 
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1], delay: 0.2 }}
-              className="text-sm sm:text-base leading-relaxed max-w-lg"
-              style={{ color: "var(--text-muted)" }}
-            >
-              Connect with board-certified physicians instantly via HD WebRTC video, analyze symptoms
-              with Gemini 1.5 AI, locate 24/7 Jan Aushadhi pharmacies, and dispatch emergency 108
-              ambulances — all in one app.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1], delay: 0.3 }}
-              className="flex flex-wrap items-center gap-3"
-            >
+            <div className="flex flex-wrap items-center gap-4 pt-2">
               <button
-                onClick={() => openModal("patient")}
-                className="flex items-center gap-2.5 rounded-2xl px-7 py-3.5 text-sm font-bold text-white transition-all"
-                style={{
-                  background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
-                  boxShadow: "0 12px 32px rgba(99,102,241,0.45), 0 0 0 1px rgba(99,102,241,0.3)",
-                }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.transform = "translateY(-2px)")}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.transform = "")}
+                type="button"
+                onClick={handleConsultationClick}
+                className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-500 px-7 py-3.5 text-sm font-bold text-white shadow-xl shadow-indigo-500/25 hover:scale-105 transition-all cursor-pointer"
               >
-                Patient Portal <ChevronRight size={16} />
+                Consult a Doctor <ChevronRight size={16} />
               </button>
               <button
-                onClick={() => openModal("doctor")}
-                className="flex items-center gap-2.5 rounded-2xl px-6 py-3.5 text-sm font-semibold transition-all"
-                style={{
-                  border: "1px solid var(--border-bright)",
-                  color: "var(--text-primary)",
-                  background: "rgba(255,255,255,0.03)",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)";
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,0.4)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)";
-                  (e.currentTarget as HTMLElement).style.borderColor = "var(--border-bright)";
-                }}
+                type="button"
+                onClick={handleDoctorPortalClick}
+                className="flex items-center gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-6 py-3.5 text-sm font-bold text-amber-300 hover:bg-amber-500/20 transition-all cursor-pointer"
               >
-                <UserCheck size={16} style={{ color: "#fbbf24" }} />
-                Doctor Portal
+                <UserCheck size={16} /> Doctor Portal
               </button>
-            </motion.div>
+            </div>
 
-            {/* Trust badges */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="flex flex-wrap items-center gap-3 pt-1"
-            >
-              {[
-                { icon: Lock, label: "256-bit Encrypted" },
-                { icon: Globe, label: "ABDM Compliant" },
-                { icon: Zap, label: "< 2s Response Time" },
-              ].map((b) => (
-                <span
-                  key={b.label}
-                  className="inline-flex items-center gap-1.5 text-[11px] font-semibold"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  <b.icon size={11} />
-                  {b.label}
-                </span>
-              ))}
-            </motion.div>
+            {/* Quick Stat Highlights */}
+            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/10 text-xs">
+              <div>
+                <p className="font-black text-lg text-white">15,000+</p>
+                <p className="text-slate-400">Nabha Residents</p>
+              </div>
+              <div>
+                <p className="font-black text-lg text-emerald-400">100+ Free</p>
+                <p className="text-slate-400">Civil Hospital Tests</p>
+              </div>
+              <div>
+                <p className="font-black text-lg text-cyan-400">108 Hotline</p>
+                <p className="text-slate-400">Emergency Dispatch</p>
+              </div>
+            </div>
           </div>
 
-          {/* Right visual */}
           <div className="flex justify-center">
-            <VitalsCard />
+            <HeroCareCard />
           </div>
         </div>
       </section>
 
-      {/* ─── FEATURE GRID ─────────────────────────────────── */}
-      <section
-        className="px-6 py-16 max-w-7xl mx-auto"
-        style={{ borderTop: "1px solid var(--border)" }}
-      >
-        <div className="text-center mb-12">
-          <motion.h2
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-            className="font-display text-3xl md:text-4xl"
-            style={{ color: "var(--text-primary)" }}
-          >
-            Everything healthcare{" "}
-            <span className="text-gradient">in one platform</span>
-          </motion.h2>
-          <p className="mt-3 text-sm" style={{ color: "var(--text-muted)" }}>
-            Built specifically for India — multi-lingual, affordable, accessible from anywhere.
+      {/* Primary Healthcare Services Grid */}
+      <section className="max-w-7xl mx-auto px-6 py-16 border-t border-white/5 space-y-12">
+        <div className="text-center space-y-3">
+          <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-400">Integrated Medical Care</span>
+          <h2 className="font-display text-3xl sm:text-4xl font-black text-white">
+            Designed for Local Healthcare Needs
+          </h2>
+          <p className="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto">
+            Combining regional hospital networks with low-cost generic pharmacies and government welfare coverage.
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f, i) => (
-            <motion.div
-              key={f.title}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: i * 0.06 }}
-              className="group relative rounded-2xl p-6 transition-all duration-300"
-              style={{
-                background: "var(--surface)",
-                border: "1px solid var(--border-bright)",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.transform = "translateY(-6px)";
-                (e.currentTarget as HTMLElement).style.borderColor = `${f.color}40`;
-                (e.currentTarget as HTMLElement).style.boxShadow = `0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px ${f.color}20`;
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.transform = "";
-                (e.currentTarget as HTMLElement).style.borderColor = "var(--border-bright)";
-                (e.currentTarget as HTMLElement).style.boxShadow = "";
-              }}
+            <div
+              key={i}
+              className="rounded-3xl border border-white/10 bg-[#0a0f1d] p-6 space-y-4 hover:border-white/20 transition-all"
             >
-              <span
-                className="inline-flex h-12 w-12 items-center justify-center rounded-xl mb-5"
-                style={{
-                  background: f.bg,
-                  color: f.color,
-                  boxShadow: `0 0 20px ${f.bg}`,
-                }}
+              <div
+                className="flex h-12 w-12 items-center justify-center rounded-2xl text-xl font-bold"
+                style={{ backgroundColor: f.bg, color: f.color }}
               >
-                <f.icon size={22} strokeWidth={1.8} />
-              </span>
-              <h3 className="font-bold text-[15px] mb-2" style={{ color: "var(--text-primary)" }}>
-                {f.title}
-              </h3>
-              <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                {f.desc}
-              </p>
-            </motion.div>
+                <f.icon size={22} />
+              </div>
+              <h3 className="font-bold text-base text-white">{f.title}</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">{f.desc}</p>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* ─── CTA FOOTER ───────────────────────────────────── */}
-      <section
-        className="px-6 py-20 text-center"
-        style={{ borderTop: "1px solid var(--border)" }}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
-        >
-          <div
-            className="inline-flex items-center gap-2 mb-6 rounded-full px-4 py-1.5 text-xs font-bold"
-            style={{
-              background: "rgba(99,102,241,0.1)",
-              border: "1px solid rgba(99,102,241,0.3)",
-              color: "#818cf8",
-            }}
-          >
-            <Activity size={12} />
-            15,000+ patients served in Nabha Region
-          </div>
-          <h2
-            className="font-display text-3xl md:text-5xl mb-6"
-            style={{ color: "var(--text-primary)" }}
-          >
-            Start your healthcare journey{" "}
-            <span className="text-gradient">today</span>
-          </h2>
-          <button
-            onClick={() => openModal("register")}
-            className="inline-flex items-center gap-2.5 rounded-2xl px-8 py-4 text-base font-bold text-white"
-            style={{
-              background: "linear-gradient(135deg, #6366f1, #22d3ee)",
-              boxShadow: "0 16px 40px rgba(99,102,241,0.45)",
-            }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.transform = "translateY(-3px) scale(1.02)")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.transform = "")}
-          >
-            Create Free Account <ChevronRight size={18} />
-          </button>
+      {/* Local Hospital Partners Section */}
+      <section className="max-w-7xl mx-auto px-6 py-12 border-t border-white/5 space-y-6">
+        <div className="text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Empanelled Regional Hospitals & Referral Hubs</p>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          {[
+            { name: "Lt. Gen. Shivdev Singh SDH", city: "Civil Hospital Nabha" },
+            { name: "Rajindra Govt Hospital", city: "Patiala (28 km)" },
+            { name: "Homi Bhabha Cancer Centre", city: "Sangrur (38 km)" },
+            { name: "Vardaan Multispeciality", city: "Nabha" },
+          ].map((h, idx) => (
+            <div key={idx} className="rounded-2xl border border-white/5 bg-[#0a0f1d] p-4 space-y-1">
+              <p className="font-bold text-xs text-white">{h.name}</p>
+              <p className="text-[11px] text-slate-400">{h.city}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-          <p className="mt-5 text-xs" style={{ color: "var(--text-muted)" }}>
-            © 2025 SEHAT Nabha Telemedicine · Made with ❤️ for India · Powered by Google Gemini AI
-          </p>
-        </motion.div>
+      {/* Patient Testimonials */}
+      <section className="max-w-7xl mx-auto px-6 py-16 border-t border-white/5 space-y-10">
+        <div className="text-center space-y-2">
+          <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-400">Local Patient Feedback</span>
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-white">Trusted by Families in Nabha</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="rounded-3xl border border-white/10 bg-[#0a0f1d] p-6 space-y-3">
+            <p className="text-xs text-slate-300 italic leading-relaxed">
+              "Got my routine diabetes and BP medicines from Jan Aushadhi Kendra right outside Civil Hospital Nabha. Saved over ₹1,200 monthly compared to market prices."
+            </p>
+            <div>
+              <p className="font-bold text-xs text-white">Harjinder Singh</p>
+              <p className="text-[11px] text-slate-400">Model Town, Nabha</p>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-[#0a0f1d] p-6 space-y-3">
+            <p className="text-xs text-slate-300 italic leading-relaxed">
+              "Booked a video consultation with Dr. Gurpreet Singh at Rajindra Hospital without traveling 28 km to Patiala or standing in long OPD queues."
+            </p>
+            <div>
+              <p className="font-bold text-xs text-white">Simran Kaur</p>
+              <p className="text-[11px] text-slate-400">Guru Nanak Pura, Nabha</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} initialTab={authTab} />

@@ -24,10 +24,10 @@ type Patient = (typeof mockPatients)['s1'];
 function VoiceCallComponent() {
   const params = useParams();
   const router = useRouter();
-  const patientId = params.patientId as keyof typeof mockPatients;
+  const patientId = params.patientId as string;
   const { toast } = useToast();
 
-  const [patient, setPatient] = useState<Patient | null>(null);
+  const [patient, setPatient] = useState<{ name: string; avatar: string; dataAiHint?: string } | null>(null);
   const [hasMicPermission, setHasMicPermission] = useState<boolean | null>(null);
   const [isMicOn, setIsMicOn] = useState(true);
   
@@ -35,9 +35,40 @@ function VoiceCallComponent() {
 
   useEffect(() => {
     if (!patientId) return;
-    setPatient(mockPatients[patientId] || null);
+    const knownMap: Record<string, string> = {
+      '1': 'Harjinder Singh',
+      '101': 'Simran Kaur',
+      '102': 'Gurpreet Singh',
+      '103': 'Harpreet Kaur',
+      's1': 'Gurdeep Kaur',
+      's2': 'Suresh Patel',
+      's3': 'Manjit Singh',
+    };
+    const resolvedName = knownMap[patientId] || (mockPatients as any)[patientId]?.name || `Patient #${patientId}`;
+    setPatient({
+      name: resolvedName,
+      avatar: (mockPatients as any)[patientId]?.avatar || `https://picsum.photos/seed/${patientId}/100/100`,
+      dataAiHint: (mockPatients as any)[patientId]?.dataAiHint || 'patient portrait',
+    });
   }, [patientId]);
 
+  const [callDuration, setCallDuration] = useState(0);
+  const [connected, setConnected] = useState(false);
+
+  useEffect(() => {
+    const connectTimer = setTimeout(() => setConnected(true), 1200);
+    const timer = setInterval(() => setCallDuration((prev) => prev + 1), 1000);
+    return () => {
+      clearTimeout(connectTimer);
+      clearInterval(timer);
+    };
+  }, []);
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -101,7 +132,14 @@ function VoiceCallComponent() {
             <div className="text-center">
                 <p className="text-muted-foreground">Voice Call with</p>
                 <h1 className="text-3xl font-bold">{patient.name}</h1>
-                <p className="mt-4 text-lg text-muted-foreground animate-pulse">Connecting...</p>
+                {connected ? (
+                  <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 text-xs font-mono font-bold text-emerald-400">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+                    <span>{formatDuration(callDuration)} · Audio Connected</span>
+                  </div>
+                ) : (
+                  <p className="mt-4 text-sm text-muted-foreground animate-pulse">Connecting audio stream...</p>
+                )}
             </div>
           
             <div className="flex items-center justify-center gap-12">

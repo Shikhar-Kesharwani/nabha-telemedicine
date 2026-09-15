@@ -5,47 +5,62 @@ import { User, ShieldCheck, Heart, Phone, MapPin, Save, Calendar, FileText } fro
 import { SectionHeader, StatCard, StatusBadge, AvatarWithRing } from "@/components/primitives";
 import { useToast } from "@/hooks/use-toast";
 import { updateUserProfile } from "@/lib/services/user";
-
-function getSession() {
-  if (typeof window === 'undefined') return null;
-  const patientSession = localStorage.getItem('sehat-session-patient');
-  if (patientSession) return { type: 'patient', ...JSON.parse(patientSession) };
-  return null;
-}
+import { getSession, type SessionUser } from "@/lib/session";
 
 export default function ProfilePage() {
   const { toast } = useToast();
-  const [sessionUser, setSessionUser] = useState<any>(null);
+  const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
 
   const [form, setForm] = useState({
-    fullName: "Jane Smith",
+    fullName: "Harjinder Singh",
     email: "user@example.com",
     phone: "+91 98765 43210",
-    dob: "1994-08-15",
-    gender: "Female",
+    dob: "1988-08-15",
+    gender: "Male",
     aadhaar: "XXXX-XXXX-8821",
     address: "Model Town, Nabha, Punjab 147201",
     bloodGroup: "O+",
     allergies: "Penicillin, Dust Mites",
-    chronicConditions: "Mild Asthma",
-    emergencyContactName: "Gurpreet Smith",
-    emergencyContactPhone: "+91 98111 22233",
+    chronicConditions: "Type 2 Diabetes",
+    sehatCardNo: "PB-SEHAT-99481",
+    emergencyContactName: "Gurpreet Kaur",
+    emergencyContactPhone: "+91 98145 00112",
   });
 
   useEffect(() => {
     const session = getSession();
     if (session?.type === 'patient') {
       setSessionUser(session);
-      setForm((prev) => ({
-        ...prev,
-        fullName: session.fullName || prev.fullName,
-        email: session.email || prev.email,
-        phone: session.phone || prev.phone,
-        dob: session.dob || prev.dob,
-        gender: session.gender || prev.gender,
-        aadhaar: session.aadhaar || prev.aadhaar,
-        address: session.address || prev.address,
-      }));
+      setForm((prev) => {
+        let contactName = session.emergencyContactName || prev.emergencyContactName;
+        let contactPhone = session.emergencyContactPhone || prev.emergencyContactPhone;
+        if (!session.emergencyContactName && session.emergencyContact) {
+          const match = session.emergencyContact.match(/^(.*?)\s*\((.*?)\)$/);
+          if (match) {
+            contactName = match[1].trim();
+            contactPhone = match[2].trim();
+          } else {
+            contactPhone = session.emergencyContact;
+          }
+        }
+
+        return {
+          ...prev,
+          fullName: session.fullName || prev.fullName,
+          email: session.email || prev.email,
+          phone: session.phone || prev.phone,
+          dob: session.dob || prev.dob,
+          gender: session.gender || prev.gender,
+          aadhaar: session.aadhaar || prev.aadhaar,
+          address: session.address || prev.address,
+          bloodGroup: session.bloodGroup || prev.bloodGroup,
+          allergies: session.allergies || prev.allergies,
+          chronicConditions: session.chronicConditions || prev.chronicConditions,
+          sehatCardNo: session.sehatCardNo || prev.sehatCardNo,
+          emergencyContactName: contactName,
+          emergencyContactPhone: contactPhone,
+        };
+      });
     }
   }, []);
 
@@ -59,19 +74,36 @@ export default function ProfilePage() {
         gender: form.gender,
         aadhaar: form.aadhaar,
         address: form.address,
+        bloodGroup: form.bloodGroup,
+        allergies: form.allergies,
+        chronicConditions: form.chronicConditions,
+        sehatCardNo: form.sehatCardNo,
+        emergencyContact: `${form.emergencyContactName} (${form.emergencyContactPhone})`,
+        emergencyContactName: form.emergencyContactName,
+        emergencyContactPhone: form.emergencyContactPhone,
       });
 
       localStorage.setItem('sehat-session-patient', JSON.stringify({
         ...sessionUser,
         fullName: form.fullName,
         phone: form.phone,
+        dob: form.dob,
+        gender: form.gender,
+        aadhaar: form.aadhaar,
         address: form.address,
+        bloodGroup: form.bloodGroup,
+        allergies: form.allergies,
+        chronicConditions: form.chronicConditions,
+        sehatCardNo: form.sehatCardNo,
+        emergencyContact: `${form.emergencyContactName} (${form.emergencyContactPhone})`,
+        emergencyContactName: form.emergencyContactName,
+        emergencyContactPhone: form.emergencyContactPhone,
       }));
     }
 
     toast({
-      title: "Profile Updated!",
-      description: "Personal & medical history preferences saved to vault.",
+      title: "Profile & Medical Records Updated! 💾",
+      description: "Personal health profile and Sehat Card details saved to database.",
     });
   };
 
@@ -86,9 +118,46 @@ export default function ProfilePage() {
           <div className="text-center sm:text-left space-y-1">
             <h1 className="font-display text-2xl sm:text-4xl text-[var(--text-primary)]">{form.fullName}</h1>
             <p className="text-xs text-[var(--text-muted)] font-mono">{form.email}</p>
-            <div className="pt-2">
+            <div className="flex flex-wrap items-center gap-2 pt-2">
               <StatusBadge variant="emerald"><ShieldCheck size={13} /> Verified Aadhaar Patient</StatusBadge>
+              <StatusBadge variant="cyan">ABHA ID: 91-8842-1092-3841</StatusBadge>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Punjab Sehat Card (MMSBY) & ABHA Digital Card */}
+      <div className="relative overflow-hidden rounded-3xl border border-[var(--accent-emerald)]/40 bg-gradient-to-br from-[#04170d] via-[#0d0d1a] to-[#0a1820] p-6 shadow-2xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border)] pb-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-2xl">
+              🦁
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--accent-emerald)]">Government of Punjab Healthcare Scheme</span>
+              <h3 className="font-display text-lg font-black text-[var(--text-primary)]">Ayushman Bharat Mukh Mantri Sehat Bima Yojana</h3>
+              <p className="text-xs text-[var(--text-muted)]">Cashless Treatment up to ₹10 Lakhs/Year for Family</p>
+            </div>
+          </div>
+          <span className="self-start sm:self-center rounded-full bg-emerald-500/20 border border-emerald-500/40 px-3.5 py-1 text-xs font-bold text-[var(--accent-emerald)]">
+            ACTIVE COVERAGE
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div className="rounded-xl border border-[var(--border)] bg-black/40 p-3 space-y-1">
+            <p className="text-[10px] uppercase font-bold text-[var(--text-muted)]">Sehat Card Number</p>
+            <p className="font-mono font-bold text-sm text-[var(--accent-emerald)]">{form.sehatCardNo}</p>
+          </div>
+
+          <div className="rounded-xl border border-[var(--border)] bg-black/40 p-3 space-y-1">
+            <p className="text-[10px] uppercase font-bold text-[var(--text-muted)]">ABHA Health Address</p>
+            <p className="font-mono font-bold text-sm text-[var(--accent-cyan)]">{form.fullName.toLowerCase().replace(/\s+/g, '')}@abdm</p>
+          </div>
+
+          <div className="rounded-xl border border-[var(--border)] bg-black/40 p-3 space-y-1">
+            <p className="text-[10px] uppercase font-bold text-[var(--text-muted)]">Empanelled Nabha Hospital</p>
+            <p className="font-bold text-xs text-[var(--text-primary)]">Civil Hospital SDH Nabha & Vardaan Hospital</p>
           </div>
         </div>
       </div>
@@ -219,6 +288,17 @@ export default function ProfilePage() {
               type="text"
               value={form.chronicConditions}
               onChange={(e) => setForm({ ...form, chronicConditions: e.target.value })}
+              className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--accent-indigo)] focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Sehat Card / Ayushman Card No.</label>
+            <input
+              type="text"
+              value={form.sehatCardNo}
+              onChange={(e) => setForm({ ...form, sehatCardNo: e.target.value })}
+              placeholder="e.g. PB-SEHAT-99481"
               className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--accent-indigo)] focus:outline-none"
             />
           </div>

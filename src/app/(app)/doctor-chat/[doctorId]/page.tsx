@@ -24,6 +24,7 @@ import { getChatMessages, sendChatMessage, type ChatMessage } from "@/lib/servic
 import { isCallAllowedForPatient, subscribeCallPermissions } from "@/lib/services/call-permissions";
 import { initiateCallSignal, subscribeCallSignals } from "@/lib/services/call-signaling";
 import { useRouter } from "next/navigation";
+import { getSession } from "@/lib/session";
 
 export default function DoctorChatRoomPage() {
   const params = useParams();
@@ -37,20 +38,25 @@ export default function DoctorChatRoomPage() {
   const [isCallAllowed, setIsCallAllowed] = useState(false);
   const [callingMode, setCallingMode] = useState<'video' | 'voice' | null>(null);
   const [callStatus, setCallStatus] = useState<"ringing" | "accepted" | "declined">("ringing");
+  const [isDoctorTyping, setIsDoctorTyping] = useState(false);
+  const [userEmail, setUserEmail] = useState("user@example.com");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const userEmail = "user@example.com";
   const userAvatar = "https://picsum.photos/seed/user-avatar/200/200";
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const session = getSession();
+    const currentEmail = session?.email || "user@example.com";
+    setUserEmail(currentEmail);
+
     async function initData() {
       if (doctorId) {
         const doc = await getDoctorById(doctorId);
         setDoctor(doc);
 
-        const history = await getChatMessages(userEmail, doctorId);
+        const history = await getChatMessages(currentEmail, doctorId);
         setMessages(history);
       }
     }
@@ -111,8 +117,9 @@ export default function DoctorChatRoomPage() {
     );
 
     setMessages(updatedMessages);
+    setIsDoctorTyping(true);
 
-    // Simulate Doctor automated review response
+    // Simulate Doctor automated review response with typing indicator
     setTimeout(async () => {
       const doctorReply = `Thank you for sharing your symptoms and details. I am reviewing your message and attachments. Once verified, I will grant Video/Voice Call permission for our consultation.`;
       const replyHistory = await sendChatMessage(
@@ -122,8 +129,9 @@ export default function DoctorChatRoomPage() {
         'doctor',
         doctor?.avatar || "D"
       );
+      setIsDoctorTyping(false);
       setMessages(replyHistory);
-    }, 400);
+    }, 1200);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -266,6 +274,17 @@ export default function DoctorChatRoomPage() {
             </div>
           );
         })}
+        {isDoctorTyping && (
+          <div className="flex items-center gap-3 animate-in fade-in duration-200">
+            <AvatarWithRing name={doctor.name || doctor.fullName} size={32} />
+            <div className="flex items-center gap-1.5 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] px-4 py-3 shadow-md">
+              <span className="h-2 w-2 rounded-full bg-[var(--accent-cyan)] animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="h-2 w-2 rounded-full bg-[var(--accent-cyan)] animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="h-2 w-2 rounded-full bg-[var(--accent-cyan)] animate-bounce" style={{ animationDelay: '300ms' }} />
+              <span className="ml-2 text-xs text-[var(--text-muted)] font-medium">{doctor.name || 'Doctor'} is typing...</span>
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 

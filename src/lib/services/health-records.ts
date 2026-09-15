@@ -13,46 +13,57 @@ export interface HealthRecord {
 }
 
 export async function getHealthRecordsForUser(userId: number): Promise<HealthRecord[]> {
-  const stmt = db.prepare('SELECT * FROM health_records WHERE userId = ? ORDER BY date DESC');
-  const rows = stmt.all(userId) as any[];
-  return rows.map(r => ({
-    id: r.id,
-    userId: r.userId,
-    name: r.name,
-    type: r.type,
-    date: r.date,
-    doctor: r.doctor,
-    content: r.content,
-  }));
+  try {
+    const stmt = db.prepare('SELECT * FROM health_records WHERE userId = ? ORDER BY date DESC');
+    const rows = stmt.all(userId) as any[];
+    return rows.map(r => ({
+      id: r.id,
+      userId: r.userId,
+      name: r.name,
+      type: r.type,
+      date: r.date,
+      doctor: r.doctor,
+      content: r.content,
+    }));
+  } catch (err) {
+    console.error('getHealthRecordsForUser error:', err);
+    return [];
+  }
 }
 
-export async function createHealthRecord(record: Omit<HealthRecord, 'id'>): Promise<HealthRecord> {
-  const stmt = db.prepare(
-    'INSERT INTO health_records (userId, name, type, date, doctor, content) VALUES (?, ?, ?, ?, ?, ?)'
-  );
-  const result = stmt.run(
-    record.userId,
-    record.name,
-    record.type,
-    record.date,
-    record.doctor,
-    record.content || ''
-  );
-  const newId = Number(result.lastInsertRowid);
-  return {
-    ...record,
-    id: newId,
-  };
+export async function createHealthRecord(record: Omit<HealthRecord, 'id'>): Promise<HealthRecord | null> {
+  try {
+    const stmt = db.prepare(
+      'INSERT INTO health_records (userId, name, type, date, doctor, content) VALUES (?, ?, ?, ?, ?, ?)'
+    );
+    const result = stmt.run(
+      record.userId,
+      record.name,
+      record.type,
+      record.date,
+      record.doctor,
+      record.content || ''
+    );
+    const newId = Number(result.lastInsertRowid);
+    return {
+      ...record,
+      id: newId,
+    };
+  } catch (err) {
+    console.error('createHealthRecord error:', err);
+    return null;
+  }
 }
 
 export async function getSampleReportContent(recordId: number): Promise<string | null> {
-  const stmt = db.prepare('SELECT * FROM health_records WHERE id = ?');
-  const record = stmt.get(recordId) as any;
-  if (!record) return null;
+  try {
+    const stmt = db.prepare('SELECT * FROM health_records WHERE id = ?');
+    const record = stmt.get(recordId) as any;
+    if (!record) return null;
 
-  if (record.content) {
-    return record.content;
-  }
+    if (record.content) {
+      return record.content;
+    }
 
   return `--- ${record.name.toUpperCase()} ---
 Date: ${record.date}
@@ -72,6 +83,10 @@ RECOMMENDATIONS:
 
 Issued by Nabha Telemedicine Services (Sehat)
 `;
+  } catch (err) {
+    console.error('getSampleReportContent error:', err);
+    return null;
+  }
 }
 
 // Alias: getHealthRecords(userId) — used by health-records page

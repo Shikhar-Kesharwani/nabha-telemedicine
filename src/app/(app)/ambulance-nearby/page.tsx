@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Siren, Phone, MapPin, Clock, ShieldAlert, CheckCircle2, Navigation } from "lucide-react";
-import { SectionHeader, StatusBadge } from "@/components/primitives";
+import { SectionHeader, StatusBadge, Modal } from "@/components/primitives";
 import { createAmbulanceDispatch, type AmbulanceDispatch } from "@/lib/services/ambulance";
 import { useToast } from "@/hooks/use-toast";
+import { getSession } from "@/lib/session";
 
 const AMBULANCES = [
   { id: "1", type: "Advanced Life Support (ALS)", driver: "Gurpreet Singh", phone: "+91 98765 10801", vehicleNo: "PB 11 AB 1081", etaMins: 6, isAvailable: true },
@@ -12,16 +13,10 @@ const AMBULANCES = [
   { id: "3", type: "Basic Life Support (BLS)", driver: "Harpreet Sharma", phone: "+91 98765 10803", vehicleNo: "PB 11 AB 1083", etaMins: 12, isAvailable: true },
 ];
 
-function getSessionEmail() {
-  if (typeof window === 'undefined') return 'user@example.com';
-  const patientSession = localStorage.getItem('sehat-session-patient');
-  if (patientSession) return JSON.parse(patientSession).email || 'user@example.com';
-  return 'user@example.com';
-}
-
 export default function AmbulanceNearbyPage() {
   const [dispatching, setDispatching] = useState(false);
   const [dispatchedAmb, setDispatchedAmb] = useState<typeof AMBULANCES[0] | null>(null);
+  const [pendingAmb, setPendingAmb] = useState<typeof AMBULANCES[0] | null>(null);
   const [eta, setEta] = useState(8);
   const [locationStr, setLocationStr] = useState("Model Town, Nabha (30.375, 76.152)");
   const { toast } = useToast();
@@ -45,9 +40,13 @@ export default function AmbulanceNearbyPage() {
     }
   }, []);
 
-  const handleDispatch = async (amb: typeof AMBULANCES[0]) => {
+  const confirmDispatch = async () => {
+    if (!pendingAmb) return;
+    const amb = pendingAmb;
+    setPendingAmb(null);
     setDispatching(true);
-    const userEmail = getSessionEmail();
+    const session = getSession();
+    const userEmail = session?.email || 'user@example.com';
 
     // Save dispatch record to SQLite database
     await createAmbulanceDispatch({
@@ -138,12 +137,164 @@ export default function AmbulanceNearbyPage() {
               </div>
 
               <button
-                onClick={() => handleDispatch(amb)}
+                onClick={() => setPendingAmb(amb)}
                 disabled={dispatching || (dispatchedAmb?.id === amb.id)}
                 className="w-full flex items-center justify-center gap-2 rounded-xl bg-[var(--accent-red)] py-2.5 text-xs font-bold text-white shadow-lg shadow-red-600/20 hover:opacity-95 disabled:opacity-50 transition-all"
               >
                 {dispatchedAmb?.id === amb.id ? "✓ Dispatched & Logged" : "Dispatch Unit Now"}
               </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Confirmation Modal */}
+      <Modal
+        open={Boolean(pendingAmb)}
+        onClose={() => setPendingAmb(null)}
+        title="Confirm 108 Emergency Ambulance Dispatch"
+      >
+        {pendingAmb && (
+          <div className="space-y-4 pt-2">
+            <p className="text-xs text-[var(--text-muted)]">Please confirm you are requesting an active emergency paramedic response.</p>
+            <div className="rounded-2xl border border-[var(--accent-red)]/30 bg-[var(--accent-red)]/10 p-4 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-white">{pendingAmb.type}</span>
+                <span className="text-[var(--accent-red)] font-bold">{pendingAmb.etaMins} Min ETA</span>
+              </div>
+              <p className="text-xs text-slate-300">Vehicle: <span className="font-mono font-bold text-white">{pendingAmb.vehicleNo}</span> • Paramedic: {pendingAmb.driver}</p>
+              <p className="text-xs text-slate-400">Broadcast Location: <span className="text-white font-medium">{locationStr}</span></p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setPendingAmb(null)}
+                className="flex-1 rounded-xl border border-[var(--border-bright)] py-2.5 text-xs font-semibold text-[var(--text-muted)] hover:bg-white/5"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDispatch}
+                disabled={dispatching}
+                className="flex-1 rounded-xl bg-[var(--accent-red)] py-2.5 text-xs font-bold text-white shadow-lg shadow-red-600/30 hover:opacity-95"
+              >
+                {dispatching ? "Dispatching..." : "Confirm & Dispatch 108"}
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Section A: Nearest Emergency Hospitals */}
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 space-y-4">
+        <h3 className="font-bold text-base text-[var(--text-primary)]">Nearest Emergency Referral Centers</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 space-y-3">
+            <div className="flex items-center gap-2 text-[var(--accent-emerald)]">
+              <ShieldAlert size={18} />
+              <span className="font-bold text-sm text-[var(--text-primary)]">Rajindra Govt Hospital, Patiala</span>
+            </div>
+            <div className="flex gap-2">
+              <StatusBadge variant="amber">28 km / ~35 min</StatusBadge>
+              <StatusBadge variant="emerald">24/7 Emergency</StatusBadge>
+            </div>
+            <a href="tel:01752212058" className="inline-flex items-center gap-2 rounded-xl bg-white/5 px-4 py-2 text-xs font-bold text-[var(--text-primary)] hover:bg-white/10 w-full justify-center">
+              <Phone size={14} /> Call: 0175-2212058
+            </a>
+          </div>
+
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 space-y-3">
+            <div className="flex items-center gap-2 text-[var(--accent-emerald)]">
+              <ShieldAlert size={18} />
+              <span className="font-bold text-sm text-[var(--text-primary)]">Vardaan Multispeciality & Trauma, Nabha</span>
+            </div>
+            <div className="flex gap-2">
+              <StatusBadge variant="amber">2 km / ~5 min</StatusBadge>
+              <StatusBadge variant="emerald">24/7 Emergency</StatusBadge>
+            </div>
+            <a href="tel:+919814600001" className="inline-flex items-center gap-2 rounded-xl bg-white/5 px-4 py-2 text-xs font-bold text-[var(--text-primary)] hover:bg-white/10 w-full justify-center">
+              <Phone size={14} /> Call: +91 98146 00001
+            </a>
+          </div>
+
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 space-y-3">
+            <div className="flex items-center gap-2 text-[var(--accent-emerald)]">
+              <ShieldAlert size={18} />
+              <span className="font-bold text-sm text-[var(--text-primary)]">Homi Bhabha Cancer Hospital, Sangrur</span>
+            </div>
+            <div className="flex gap-2">
+              <StatusBadge variant="amber">38 km / ~45 min</StatusBadge>
+              <StatusBadge variant="emerald">Cancer Emergencies</StatusBadge>
+            </div>
+            <a href="tel:01672523100" className="inline-flex items-center gap-2 rounded-xl bg-white/5 px-4 py-2 text-xs font-bold text-[var(--text-primary)] hover:bg-white/10 w-full justify-center">
+              <Phone size={14} /> Call: 01672-523100
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Section B: Pesticide & Chemical Emergency Guide */}
+      <div className="rounded-2xl border border-[var(--accent-amber)] bg-[var(--accent-amber)]/10 p-6 space-y-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-4 opacity-10"><ShieldAlert size={100} className="text-[var(--accent-amber)]" /></div>
+        <div className="relative z-10 space-y-4">
+          <div>
+            <h3 className="font-bold text-lg text-[var(--accent-amber)] flex items-center gap-2">
+              ⚠️ Agricultural Chemical / Pesticide Poisoning
+            </h3>
+            <p className="text-sm text-[var(--accent-amber)]/80 mt-1">Most common farm emergency in Punjab — act immediately</p>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-start gap-3">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-amber)]/20 text-xs font-bold text-[var(--accent-amber)]">1</span>
+              <p className="text-sm text-[var(--text-primary)] mt-0.5">Move patient to fresh air immediately, remove contaminated clothing</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-amber)]/20 text-xs font-bold text-[var(--accent-amber)]">2</span>
+              <p className="text-sm text-[var(--text-primary)] mt-0.5">Do <strong className="text-[var(--accent-amber)]">NOT</strong> induce vomiting for organophosphate/pesticide ingestion</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-amber)]/20 text-xs font-bold text-[var(--accent-amber)]">3</span>
+              <p className="text-sm text-[var(--text-primary)] mt-0.5">Call 108 immediately — tell them 'pesticide poisoning'</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-amber)]/20 text-xs font-bold text-[var(--accent-amber)]">4</span>
+              <p className="text-sm text-[var(--text-primary)] mt-0.5">Rinse skin/eyes with clean water for 15 minutes</p>
+            </div>
+          </div>
+          
+          <div className="rounded-xl border border-[var(--accent-amber)]/30 bg-[var(--accent-amber)]/20 p-4">
+            <p className="text-sm font-bold text-[var(--accent-amber)] text-center">
+              Poison Control: Rajindra Hospital Patiala — <a href="tel:01752212058" className="underline">0175-2212058</a> (24/7)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Section C: Punjab Government Health Helplines */}
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 space-y-4">
+        <h3 className="font-bold text-base text-[var(--text-primary)]">Punjab Government Health Helplines</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {[
+            { num: "108", desc: "Free Emergency Ambulance (24/7)" },
+            { num: "104", desc: "Health Advice & Scheme Queries (toll-free)" },
+            { num: "14555", desc: "Ayushman Bharat / Sehat Card Helpline" },
+            { num: "1800-11-0031", desc: "De-addiction / Drug Helpline (Punjab, toll-free)" },
+            { num: "0175-2212058", desc: "Rajindra Hospital Emergency, Patiala" }
+          ].map((hl, i) => (
+            <div key={i} className="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
+              <div className="flex items-center gap-3">
+                <Phone size={16} className="text-[var(--accent-emerald)]" />
+                <div>
+                  <p className="font-bold text-sm text-[var(--text-primary)]">{hl.num}</p>
+                  <p className="text-xs text-[var(--text-muted)]">{hl.desc}</p>
+                </div>
+              </div>
+              <a href={`tel:${hl.num.replace(/[- ]/g, '')}`} className="rounded-lg bg-white/5 px-3 py-1.5 text-xs font-bold text-[var(--text-primary)] hover:bg-white/10 shrink-0">
+                Call
+              </a>
             </div>
           ))}
         </div>

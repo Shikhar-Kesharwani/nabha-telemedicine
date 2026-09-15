@@ -9,6 +9,13 @@ export interface User {
   gender?: string;
   aadhaar?: string;
   address?: string;
+  bloodGroup?: string;
+  allergies?: string;
+  chronicConditions?: string;
+  sehatCardNo?: string;
+  emergencyContact?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
 }
 
 export interface Doctor {
@@ -27,6 +34,8 @@ export interface Doctor {
     password?: string; // Should not be sent to client
     licenseNumber?: string;
     phone?: string;
+    hospital?: string;
+    location?: string;
 }
 
 export interface Appointment {

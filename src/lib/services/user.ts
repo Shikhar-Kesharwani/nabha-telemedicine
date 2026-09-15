@@ -16,6 +16,13 @@ export interface UserSession {
   aadhaar?: string;
   address?: string;
   specialty?: string;
+  bloodGroup?: string;
+  allergies?: string;
+  chronicConditions?: string;
+  sehatCardNo?: string;
+  emergencyContact?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
@@ -32,6 +39,13 @@ export async function getUserByEmail(email: string): Promise<User | null> {
       gender: user.gender,
       aadhaar: user.aadhaar,
       address: user.address,
+      bloodGroup: user.bloodGroup,
+      allergies: user.allergies,
+      chronicConditions: user.chronicConditions,
+      sehatCardNo: user.sehatCardNo,
+      emergencyContact: user.emergencyContact,
+      emergencyContactName: user.emergencyContactName,
+      emergencyContactPhone: user.emergencyContactPhone,
     };
   } catch (err) {
     return null;
@@ -72,24 +86,43 @@ export async function loginPatient(email: string, pass: string): Promise<{ ok: b
     const user = stmt.get(email) as any;
 
     if (!user) {
-      // Auto-register demo account if logging in with default credentials
       if (email === 'user@example.com' && pass === 'user123') {
-        const demo = {
+        const demo: User = {
           id: 1,
           email: 'user@example.com',
-          fullName: 'Jane Smith',
+          fullName: 'Harjinder Singh',
           phone: '9876543210',
-          dob: '1990-05-15',
-          gender: 'Female',
+          dob: '1988-08-15',
+          gender: 'Male',
           aadhaar: '123456789012',
-          address: 'Model Town, Nabha',
+          address: 'Model Town, Nabha, Punjab',
+          bloodGroup: 'O+',
+          allergies: 'Penicillin',
+          chronicConditions: 'Type 2 Diabetes',
+          sehatCardNo: 'PB-SEHAT-99481',
+          emergencyContact: 'Gurpreet Kaur (+91 98145 00112)',
         };
         return { ok: true, user: demo };
       }
       return { ok: false, error: 'Invalid patient email or password' };
     }
 
-    if (user.password && !(await bcrypt.compare(pass, user.password)) && pass !== user.password) {
+    let isMatch = false;
+    if (user.password) {
+      if (user.password === pass) {
+        isMatch = true;
+      } else {
+        try {
+          isMatch = await bcrypt.compare(pass, user.password);
+        } catch (_) {
+          isMatch = false;
+        }
+      }
+    } else {
+      isMatch = true;
+    }
+
+    if (!isMatch) {
       return { ok: false, error: 'Invalid patient email or password' };
     }
 
@@ -104,11 +137,16 @@ export async function loginPatient(email: string, pass: string): Promise<{ ok: b
         gender: user.gender,
         aadhaar: user.aadhaar,
         address: user.address,
+        bloodGroup: user.bloodGroup,
+        allergies: user.allergies,
+        chronicConditions: user.chronicConditions,
+        sehatCardNo: user.sehatCardNo,
+        emergencyContact: user.emergencyContact,
       },
     };
   } catch (err) {
     console.error('loginPatient error:', err);
-    return { ok: false, error: 'Cloud authentication failed' };
+    return { ok: false, error: 'Authentication failed. Please check your credentials.' };
   }
 }
 
@@ -118,17 +156,17 @@ export async function loginDoctor(email: string, pass: string): Promise<{ ok: bo
     const doctor = stmt.get(email) as any;
 
     if (!doctor) {
-      if (email === 'doctor@example.com' && pass === 'doc123') {
+      if ((email === 'doctor@example.com' || email === 'gurpreet.singh@nabhahealth.in') && (pass === 'doc123' || pass === 'doctor123')) {
         const demoDoc: Doctor = {
           id: 1,
-          fullName: 'Dr. Rajesh Sharma',
-          name: 'Dr. Rajesh Sharma',
+          fullName: 'Dr. Gurpreet Singh',
+          name: 'Dr. Gurpreet Singh',
           specialty: 'Cardiologist',
-          experience: 15,
+          experience: 14,
           rating: 4.9,
-          reviews: 128,
-          avatar: 'https://picsum.photos/seed/doctor-1/200/200',
-          dataAiHint: 'doctor avatar',
+          reviews: 187,
+          avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=400&auto=format&fit=crop',
+          dataAiHint: 'doctor portrait',
           available: true,
           consultationFee: 500,
           email: 'doctor@example.com',
@@ -138,12 +176,31 @@ export async function loginDoctor(email: string, pass: string): Promise<{ ok: bo
       return { ok: false, error: 'Invalid doctor email or password' };
     }
 
+    let isMatch = false;
+    if (doctor.password) {
+      if (doctor.password === pass) {
+        isMatch = true;
+      } else {
+        try {
+          isMatch = await bcrypt.compare(pass, doctor.password);
+        } catch (_) {
+          isMatch = false;
+        }
+      }
+    } else {
+      isMatch = true;
+    }
+
+    if (!isMatch) {
+      return { ok: false, error: 'Invalid doctor email or password' };
+    }
+
     return {
       ok: true,
       doctor: {
         id: doctor.id,
-        fullName: doctor.fullName,
-        name: doctor.fullName,
+        fullName: doctor.fullName || doctor.name,
+        name: doctor.fullName || doctor.name,
         specialty: doctor.specialty,
         experience: doctor.experience,
         rating: doctor.rating,
@@ -216,9 +273,23 @@ export async function registerPatient(regData: {
 export async function updateUserProfile(userId: number, data: Partial<User>): Promise<boolean> {
   try {
     const stmt = db.prepare(
-      'UPDATE users SET fullName = COALESCE(?, fullName), phone = COALESCE(?, phone), dob = COALESCE(?, dob), gender = COALESCE(?, gender), address = COALESCE(?, address) WHERE id = ?'
+      'UPDATE users SET fullName = COALESCE(?, fullName), phone = COALESCE(?, phone), dob = COALESCE(?, dob), gender = COALESCE(?, gender), address = COALESCE(?, address), bloodGroup = COALESCE(?, bloodGroup), allergies = COALESCE(?, allergies), chronicConditions = COALESCE(?, chronicConditions), sehatCardNo = COALESCE(?, sehatCardNo), emergencyContact = COALESCE(?, emergencyContact), emergencyContactName = COALESCE(?, emergencyContactName), emergencyContactPhone = COALESCE(?, emergencyContactPhone) WHERE id = ?'
     );
-    stmt.run(data.fullName, data.phone, data.dob, data.gender, data.address, userId);
+    stmt.run(
+      data.fullName,
+      data.phone,
+      data.dob,
+      data.gender,
+      data.address,
+      (data as any).bloodGroup,
+      (data as any).allergies,
+      (data as any).chronicConditions,
+      (data as any).sehatCardNo,
+      (data as any).emergencyContact,
+      (data as any).emergencyContactName,
+      (data as any).emergencyContactPhone,
+      userId
+    );
     return true;
   } catch (err) {
     console.error('updateUserProfile error:', err);

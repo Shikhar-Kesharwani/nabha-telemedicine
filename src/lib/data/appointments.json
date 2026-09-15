@@ -1,39 +1,39 @@
 {
-    "appointments": [
-        {
-            "userId": 5,
-            "type": "Doctor",
-            "name": "Dr. Meena Iyer",
-            "details": "Gynecologist",
-            "date": "2025-09-24",
-            "time": "02:30 PM",
-            "avatar": "https://picsum.photos/seed/doc8/400/400",
-            "dataAiHint": "doctor friendly",
-            "doctorId": 8,
-            "id": 1
-        },
-        {
-            "userId": 5,
-            "type": "Doctor",
-            "name": "Dr. Meena Iyer",
-            "details": "Gynecologist",
-            "date": "2025-09-24",
-            "time": "02:30 PM",
-            "avatar": "https://picsum.photos/seed/doc8/400/400",
-            "dataAiHint": "doctor friendly",
-            "doctorId": 8,
-            "id": 2
-        },
-        {
-            "userId": 5,
-            "type": "Lab Test",
-            "name": "Thyrocare Aarogyam Center",
-            "details": "Scheduled Lab Test",
-            "date": "2025-09-20",
-            "time": "10:00 AM",
-            "avatar": "https://picsum.photos/seed/lab/100/100",
-            "dataAiHint": "laboratory test tube",
-            "id": 3
-        }
-    ]
+  "appointments": [
+    {
+      "userId": 1,
+      "type": "Doctor",
+      "name": "Dr. Harpreet Kaur",
+      "details": "Diabetologist — HbA1c Follow-up",
+      "date": "2025-09-24",
+      "time": "10:30 AM",
+      "avatar": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=400&auto=format&fit=crop",
+      "dataAiHint": "female doctor professional",
+      "doctorId": 2,
+      "id": 1
+    },
+    {
+      "userId": 1,
+      "type": "Lab Test",
+      "name": "Krsnaa Diagnostics, Nabha",
+      "details": "HbA1c + Fasting Blood Glucose + Lipid Profile",
+      "date": "2025-09-20",
+      "time": "08:00 AM",
+      "avatar": "https://picsum.photos/seed/lab-nabha/100/100",
+      "dataAiHint": "laboratory test tube",
+      "id": 2
+    },
+    {
+      "userId": 1,
+      "type": "Doctor",
+      "name": "Dr. Gurpreet Singh",
+      "details": "Cardiologist — BP Monitoring Follow-up",
+      "date": "2025-10-05",
+      "time": "11:00 AM",
+      "avatar": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=400&auto=format&fit=crop",
+      "dataAiHint": "doctor portrait",
+      "doctorId": 1,
+      "id": 3
+    }
+  ]
 }

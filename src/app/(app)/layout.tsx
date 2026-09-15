@@ -28,6 +28,7 @@ import {
   Sparkles,
   Bell,
   Search,
+  Building2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -47,6 +48,7 @@ const NAV_ITEMS = [
   { label: "Voice Call", path: "/voice-call", icon: Mic, accent: "violet" },
   { label: "Medicine Finder", path: "/medicine-finder", icon: Pill, accent: "emerald" },
   { label: "Pharmacies", path: "/pharmacy-locator", icon: MapPin, accent: "emerald" },
+  { label: "Civil Hospital OPD", path: "/civil-hospital-opd", icon: Building2, accent: "emerald" },
   { label: "Ambulance Nearby", path: "/ambulance-nearby", icon: Siren, accent: "red" },
 ] as const;
 
@@ -59,20 +61,7 @@ const accentColors: Record<string, { text: string; bg: string; hex: string; glow
   red: { text: "#f87171", bg: "rgba(239,68,68,0.12)", hex: "#ef4444", glow: "rgba(239,68,68,0.3)" },
 };
 
-function getSession() {
-  if (typeof window === 'undefined') return null;
-  const patientSession = localStorage.getItem('sehat-session-patient');
-  if (patientSession) return { type: 'patient', ...JSON.parse(patientSession) };
-  const doctorSession = localStorage.getItem('sehat-session-doctor');
-  if (doctorSession) return { type: 'doctor', ...JSON.parse(doctorSession) };
-  return null;
-}
-
-function logout() {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem('sehat-session-patient');
-  localStorage.removeItem('sehat-session-doctor');
-}
+import { getSession, logout } from "@/lib/session";
 
 /* ── SIDEBAR ─────────────────────────────────────────────── */
 
@@ -89,7 +78,7 @@ function Sidebar({ collapsed, mobileOpen, onCloseMobile }: {
   useEffect(() => {
     const session = getSession();
     if (session?.fullName) {
-      setUser({ fullName: session.fullName, email: session.email });
+      setUser({ fullName: session.fullName, email: session.email || '' });
     } else {
       router.replace('/');
     }
@@ -390,8 +379,8 @@ function VoiceCommandButton() {
 
 const LANGUAGE_LABELS: Record<string, string> = {
   en: "EN",
-  hi: "हि",
-  pa: "ਪੰਜ",
+  hi: "हिन्दी",
+  pa: "ਪੰਜਾਬੀ",
 };
 
 /* ── HEADER ──────────────────────────────────────────────── */
@@ -545,6 +534,136 @@ function Header({
   );
 }
 
+/* ── DEMO PERSONA SWITCHER ───────────────────────────────── */
+
+/**
+ * Floating pill button for recruiters / evaluators.
+ * Allows instant one-click login as Patient or Doctor without entering a password.
+ * Visible in all app pages; can be collapsed to a small tab to stay out of the way.
+ */
+function DemoSwitcher() {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [switched, setSwitched] = useState<'patient' | 'doctor' | null>(null);
+
+  const loginAsPatient = () => {
+    const session = {
+      userId: 1,
+      fullName: 'Harjinder Singh',
+      email: 'user@example.com',
+      phone: '9876543210',
+      bloodGroup: 'O+',
+      type: 'patient',
+    };
+    try {
+      localStorage.setItem('sehat-session-patient', JSON.stringify(session));
+      localStorage.removeItem('sehat-session-doctor');
+    } catch (_) {}
+    setSwitched('patient');
+    setOpen(false);
+    setTimeout(() => { router.push('/dashboard'); router.refresh(); }, 120);
+  };
+
+  const loginAsDoctor = () => {
+    const session = {
+      id: 1,
+      fullName: 'Dr. Gurpreet Singh',
+      email: 'doctor@example.com',
+      specialty: 'Cardiologist',
+      hospital: 'Rajindra Hospital, Patiala',
+      type: 'doctor',
+    };
+    try {
+      localStorage.setItem('sehat-session-doctor', JSON.stringify(session));
+      localStorage.removeItem('sehat-session-patient');
+    } catch (_) {}
+    setSwitched('doctor');
+    setOpen(false);
+    setTimeout(() => { router.push('/doctor/dashboard'); router.refresh(); }, 120);
+  };
+
+  return (
+    <div
+      className="fixed bottom-6 right-5 z-[9999] flex flex-col items-end gap-2"
+      style={{ fontFamily: 'inherit' }}
+    >
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 6, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+            className="rounded-2xl p-3 flex flex-col gap-2 min-w-[200px]"
+            style={{
+              background: 'rgba(10,10,25,0.96)',
+              border: '1px solid rgba(99,102,241,0.4)',
+              boxShadow: '0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(99,102,241,0.15)',
+              backdropFilter: 'blur(20px)',
+            }}
+          >
+            <p
+              className="text-[10px] font-black tracking-[0.2em] uppercase px-1 pb-1"
+              style={{ color: 'rgba(148,163,184,0.6)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+            >
+              🎯 Recruiter Demo Mode
+            </p>
+            <button
+              onClick={loginAsPatient}
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-all"
+              style={{ background: 'rgba(99,102,241,0.12)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(99,102,241,0.2)')}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(99,102,241,0.12)')}
+            >
+              <span className="text-base">🧑‍💼</span>
+              <span>
+                <span className="block text-xs font-black">Patient</span>
+                <span className="block text-[10px] font-normal" style={{ color: 'rgba(148,163,184,0.7)' }}>Harjinder Singh</span>
+              </span>
+            </button>
+            <button
+              onClick={loginAsDoctor}
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-all"
+              style={{ background: 'rgba(34,211,238,0.1)', color: '#67e8f9', border: '1px solid rgba(34,211,238,0.3)' }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(34,211,238,0.2)')}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'rgba(34,211,238,0.1)')}
+            >
+              <span className="text-base">👨‍⚕️</span>
+              <span>
+                <span className="block text-xs font-black">Doctor</span>
+                <span className="block text-[10px] font-normal" style={{ color: 'rgba(148,163,184,0.7)' }}>Dr. Gurpreet Singh, MD</span>
+              </span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Trigger pill */}
+      <motion.button
+        onClick={() => setOpen((v) => !v)}
+        whileHover={{ scale: 1.04 }}
+        whileTap={{ scale: 0.96 }}
+        className="flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-black tracking-wide uppercase transition-all"
+        style={{
+          background: open
+            ? 'rgba(99,102,241,0.25)'
+            : 'linear-gradient(135deg, rgba(99,102,241,0.9) 0%, rgba(34,211,238,0.9) 100%)',
+          color: 'white',
+          boxShadow: open
+            ? '0 4px 20px rgba(99,102,241,0.3)'
+            : '0 4px 24px rgba(99,102,241,0.5), 0 0 0 1px rgba(99,102,241,0.3)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(16px)',
+        }}
+        aria-label="Demo persona switcher"
+      >
+        <Sparkles size={13} />
+        {switched === 'patient' ? '👤 Patient' : switched === 'doctor' ? '🩺 Doctor' : 'Demo'}
+      </motion.button>
+    </div>
+  );
+}
+
 /* ── ROOT LAYOUT ─────────────────────────────────────────── */
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -554,9 +673,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => setMobileOpen(false), [pathname]);
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("sehat-sidebar-collapsed");
+      if (saved !== null) {
+        setCollapsed(saved === "true");
+      }
+    } catch (_) {}
+  }, []);
+
+  const handleToggleSidebar = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("sehat-sidebar-collapsed", String(next));
+      } catch (_) {}
+      return next;
+    });
+  };
+
   return (
     <I18nextProvider i18n={i18n}>
-      <div className="min-h-screen" style={{ background: "var(--bg-root)" }}>
+      <div className="min-h-screen" style={{ background: "var(--bg-root)" }} suppressHydrationWarning>
         <Sidebar
           collapsed={collapsed}
           mobileOpen={mobileOpen}
@@ -564,9 +702,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         />
         <div
           className={cn("transition-[margin] duration-300 ease-in-out", collapsed ? "md:ml-[60px]" : "md:ml-[240px]")}
+          suppressHydrationWarning
         >
           <Header
-            onToggleSidebar={() => setCollapsed((v) => !v)}
+            onToggleSidebar={handleToggleSidebar}
             onOpenMobile={() => setMobileOpen(true)}
           />
           <motion.main
@@ -575,10 +714,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+            suppressHydrationWarning
           >
             {children}
           </motion.main>
         </div>
+        <DemoSwitcher />
       </div>
     </I18nextProvider>
   );

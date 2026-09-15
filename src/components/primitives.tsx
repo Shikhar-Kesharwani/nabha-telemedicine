@@ -375,7 +375,7 @@ export function Modal({
           aria-modal="true"
         >
           <motion.div
-            className={cn("w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl", maxWidth)}
+            className={cn("relative w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl", maxWidth)}
             style={{
               background: "var(--surface)",
               border: "1px solid var(--border-bright)",
@@ -386,6 +386,13 @@ export function Modal({
             exit={{ opacity: 0, y: 12, scale: 0.98 }}
             transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
           >
+            <button
+              onClick={onClose}
+              aria-label="Close dialog"
+              className="absolute top-4 right-4 z-10 rounded-full p-2 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+            >
+              <X size={18} />
+            </button>
             {title && (
               <div
                 className="flex items-center justify-between px-5 py-4"
@@ -400,22 +407,6 @@ export function Modal({
                     {title}
                   </h3>
                 </div>
-                <button
-                  onClick={onClose}
-                  aria-label="Close dialog"
-                  className="rounded-lg p-1.5 transition-all"
-                  style={{ color: "var(--text-muted)" }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.06)";
-                    (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-                    (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)";
-                  }}
-                >
-                  <X size={17} />
-                </button>
               </div>
             )}
             <div className="p-5">{children}</div>

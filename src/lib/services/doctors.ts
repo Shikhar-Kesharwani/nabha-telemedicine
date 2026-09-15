@@ -22,6 +22,8 @@ function mapDoctorRow(row: any): Doctor {
     password: row.password,
     licenseNumber: row.licenseNumber,
     phone: row.phone,
+    hospital: row.hospital || 'Rajindra Hospital, Patiala',
+    location: row.location || 'Patiala, Punjab',
   } as Doctor;
 }
 
@@ -35,8 +37,13 @@ export async function getDoctors(): Promise<Doctor[]> {
 }
 
 export async function getDoctorById(id: number | string): Promise<Doctor | null> {
+  const parsedId = Number(id);
   const stmt = db.prepare('SELECT * FROM doctors WHERE id = ?');
-  const row = stmt.get(Number(id)) as any;
+  let row = !isNaN(parsedId) ? (stmt.get(parsedId) as any) : null;
+  if (!row) {
+    // Fallback to primary doctor (id: 1) if doc-001 or invalid string ID passed
+    row = stmt.get(1) as any;
+  }
   if (!row) return null;
   const { password, ...doctorWithoutPassword } = mapDoctorRow(row);
   return doctorWithoutPassword as Doctor;

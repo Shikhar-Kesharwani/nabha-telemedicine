@@ -26,11 +26,11 @@ type Patient = (typeof mockPatients)['p1'];
 function VideoCallComponent() {
   const params = useParams();
   const router = useRouter();
-  const patientId = params.patientId as keyof typeof mockPatients;
+  const patientId = params.patientId as string;
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
   
-  const [patient, setPatient] = useState<Patient | null>(null);
+  const [patient, setPatient] = useState<{ name: string; avatar: string } | null>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [isMicOn, setIsMicOn] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(true);
@@ -38,7 +38,20 @@ function VideoCallComponent() {
 
   useEffect(() => {
     if (!patientId) return;
-    setPatient(mockPatients[patientId] || mockPatients.emergency);
+    const knownMap: Record<string, string> = {
+      '1': 'Harjinder Singh',
+      '101': 'Simran Kaur',
+      '102': 'Gurpreet Singh',
+      '103': 'Harpreet Kaur',
+      'p1': 'Rajesh Kumar',
+      'p2': 'Priya Sharma',
+      'p3': 'Amarjit Singh',
+    };
+    const resolvedName = knownMap[patientId] || (mockPatients as any)[patientId]?.name || `Patient #${patientId}`;
+    setPatient({
+      name: resolvedName,
+      avatar: (mockPatients as any)[patientId]?.avatar || `https://picsum.photos/seed/${patientId}/100/100`,
+    });
   }, [patientId]);
 
   useEffect(() => {

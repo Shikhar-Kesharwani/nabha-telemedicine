@@ -6,6 +6,17 @@ import { SectionHeader, StatusBadge } from "@/components/primitives";
 import { getPharmacies, type Pharmacy } from "@/lib/services/pharmacies";
 import { useToast } from "@/hooks/use-toast";
 
+function formatPhone(num: string): string {
+  const cleaned = num.replace(/\D/g, "");
+  if (cleaned.length === 10) {
+    return `+91 ${cleaned.slice(0, 5)} ${cleaned.slice(5)}`;
+  }
+  if (cleaned.length === 11 && cleaned.startsWith("0")) {
+    return `+91 ${cleaned.slice(1, 5)} ${cleaned.slice(5)}`;
+  }
+  return num;
+}
+
 export default function PharmacyLocatorPage() {
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
   const [query, setQuery] = useState("");
@@ -99,6 +110,34 @@ export default function PharmacyLocatorPage() {
         </button>
       </div>
 
+      {/* Interactive OpenStreetMap Leaflet Geo-Map Widget */}
+      <div className="relative overflow-hidden rounded-3xl border border-[var(--accent-emerald)]/30 bg-[var(--surface)] p-4 space-y-3">
+        <div className="flex items-center justify-between px-2">
+          <div className="flex items-center gap-2">
+            <MapPin className="text-[var(--accent-emerald)]" size={18} />
+            <h3 className="font-bold text-sm text-[var(--text-primary)]">Interactive Map — Pharmacies & Civil Hospital Nabha</h3>
+          </div>
+          <span className="text-[11px] font-mono text-[var(--accent-emerald)]">Lat 30.375, Lng 76.152</span>
+        </div>
+
+        <div className="relative w-full h-64 rounded-2xl overflow-hidden border border-[var(--border)]">
+          <iframe
+            title="Nabha Pharmacies Map"
+            width="100%"
+            height="100%"
+            frameBorder="0"
+            scrolling="no"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=76.1400%2C30.3650%2C76.1650%2C30.3850&amp;layer=mapnik&amp;marker=30.3753%2C76.1524"
+            className="filter invert contrast-125 brightness-90 hue-rotate-180"
+          />
+          <div className="absolute bottom-3 left-3 bg-[#0d0d1a]/90 backdrop-blur border border-[var(--border)] rounded-xl px-3 py-2 text-[11px] space-y-1">
+            <p className="font-bold text-[var(--text-primary)]">📍 Marked Locations (Nabha Tehsil):</p>
+            <p className="text-[var(--accent-emerald)]">🟢 Jan Aushadhi Central & Model Town</p>
+            <p className="text-[var(--accent-cyan)]">🔵 SDH Civil Hospital & Sanjivani Chemist</p>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map((p) => (
           <div key={p.id} className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 flex flex-col justify-between card-3d-hover space-y-4">
@@ -109,6 +148,10 @@ export default function PharmacyLocatorPage() {
                   <div className="flex items-center gap-1.5 mt-1 text-xs text-[var(--text-muted)]">
                     <MapPin size={13} className="shrink-0 text-[var(--accent-emerald)]" />
                     <span>{p.address}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-0.5 text-xs text-[var(--text-muted)]">
+                    <Phone size={12} className="shrink-0 text-[var(--accent-emerald)]" />
+                    <span className="font-mono text-[11px]">{formatPhone(p.phone)}</span>
                   </div>
                 </div>
               </div>
@@ -123,7 +166,7 @@ export default function PharmacyLocatorPage() {
 
             <div className="flex gap-3 pt-2">
               <a
-                href={`tel:${p.phone}`}
+                href={`tel:${p.phone.replace(/\D/g, '')}`}
                 className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 py-2.5 text-xs font-bold text-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/20 transition-colors"
               >
                 <Phone size={14} /> Call Chemist

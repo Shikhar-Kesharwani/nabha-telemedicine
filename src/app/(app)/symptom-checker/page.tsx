@@ -36,6 +36,7 @@ export default function SymptomCheckerPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [listening, setListening] = useState(false);
+  const [voiceLang, setVoiceLang] = useState<'en-IN' | 'hi-IN'>('en-IN');
   const { toast } = useToast();
 
   const toggleVoiceInput = () => {
@@ -47,7 +48,7 @@ export default function SymptomCheckerPage() {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = "en-IN";
+    recognition.lang = voiceLang;
     recognition.continuous = false;
     recognition.onstart = () => setListening(true);
     recognition.onend = () => setListening(false);
@@ -127,23 +128,45 @@ export default function SymptomCheckerPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Describe What You Are Feeling</label>
-              <button
-                type="button"
-                onClick={toggleVoiceInput}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-colors border ${
-                  listening ? 'bg-[var(--accent-red)]/15 text-[var(--accent-red)] border-[var(--accent-red)]/30' : 'bg-white/5 text-[var(--text-muted)] border-[var(--border)]'
-                }`}
-              >
-                {listening ? <Mic size={14} className="animate-pulse" /> : <MicOff size={14} />}
-                {listening ? 'Listening...' : 'Voice Dictation'}
-              </button>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center rounded-full border border-[var(--border)] bg-white/5 p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setVoiceLang('en-IN')}
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition-colors ${
+                      voiceLang === 'en-IN' ? 'bg-[var(--accent-emerald)] text-white' : 'text-[var(--text-muted)] hover:text-white'
+                    }`}
+                  >
+                    EN
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setVoiceLang('hi-IN')}
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition-colors ${
+                      voiceLang === 'hi-IN' ? 'bg-[var(--accent-emerald)] text-white' : 'text-[var(--text-muted)] hover:text-white'
+                    }`}
+                  >
+                    हिं
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleVoiceInput}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-colors border ${
+                    listening ? 'bg-[var(--accent-red)]/15 text-[var(--accent-red)] border-[var(--accent-red)]/30' : 'bg-white/5 text-[var(--text-muted)] border-[var(--border)]'
+                  }`}
+                >
+                  {listening ? <Mic size={14} className="animate-pulse" /> : <MicOff size={14} />}
+                  {listening ? 'Listening...' : 'Voice Dictation'}
+                </button>
+              </div>
             </div>
 
             <textarea
               rows={4}
               value={symptoms}
               onChange={(e) => setSymptoms(e.target.value)}
-              placeholder="e.g., I have had a dry cough, low-grade fever, and mild headache for 2 days..."
+              placeholder={voiceLang === 'hi-IN' ? "जैसे: मुझे दो दिन से बुखार है, सिरदर्द और खांसी है..." : "e.g., I have had a dry cough, low-grade fever, and mild headache for 2 days..."}
               className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-sm text-[var(--text-primary)] focus:border-[var(--accent-emerald)] focus:outline-none"
               required
             />

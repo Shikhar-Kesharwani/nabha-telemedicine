@@ -18,18 +18,7 @@ import {
 import type { Doctor } from '@/types/db';
 import { getDoctorByEmailForAuth } from '@/lib/services/doctors';
 
-function getSession() {
-  if (typeof window === 'undefined') return null;
-  const doctorSession = localStorage.getItem('sehat-session-doctor');
-  if (doctorSession) return { type: 'doctor', ...JSON.parse(doctorSession) };
-  return null;
-}
-
-function logout() {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem('sehat-session-patient');
-  localStorage.removeItem('sehat-session-doctor');
-}
+import { getDoctorSession, logout } from '@/lib/session';
 
 export default function DoctorLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -38,8 +27,8 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     async function fetchDoctor() {
-      const session = getSession();
-      if (session?.type === 'doctor' && session.email) {
+      const session = getDoctorSession();
+      if (session?.email) {
         const doctorData = await getDoctorByEmailForAuth(session.email);
         setDoctor(doctorData);
       } else {
