@@ -113,6 +113,21 @@ The entire platform runs on a **zero-cost infrastructure** (Vercel + Render + Fi
 
 <br/>
 
+<div align="center">
+
+### 🎯 Recruiter & Evaluator Quick Demo
+
+This project includes a **1-Click Demo Persona Switcher** built directly into the UI (floating bottom-right pill) — zero registration or passwords required:
+
+| Role | Persona | Access | Key Features to Test |
+| :--- | :--- | :---: | :--- |
+| 🧑‍💼 **Patient** | Harjinder Singh | `/dashboard` | AI Symptom Checker, Vitest-validated vitals logging, Jan Aushadhi generic savings calculator, booking slots |
+| 👨‍⚕️ **Doctor** | Dr. Gurpreet Singh, MD (Cardiologist) | `/doctor/dashboard` | Live patient consult queue, WebRTC call authorization gate, digital prescription writer |
+
+</div>
+
+<br/>
+
 <img src="https://capsule-render.vercel.app/api?type=rect&color=0:a855f7,50:6366f1,100:22d3ee&height=1" width="100%" alt="divider"/>
 
 <br/>
@@ -693,7 +708,7 @@ docker run -d \
 | Workflow | Badge | Trigger |
 | :--- | :---: | :--- |
 | 🔍 Lint | [![Lint](https://img.shields.io/github/actions/workflow/status/Shikhar-Kesharwani/nabha-telemedicine/lint.yml?style=flat-square&color=6366f1&label=status)](https://github.com/Shikhar-Kesharwani/nabha-telemedicine/actions/workflows/lint.yml) | Push / PR |
-| 🧪 Tests | [![Tests](https://img.shields.io/github/actions/workflow/status/Shikhar-Kesharwani/nabha-telemedicine/test.yml?style=flat-square&color=22d3ee&label=status)](https://github.com/Shikhar-Kesharwani/nabha-telemedicine/actions/workflows/test.yml) | Push / PR |
+| 🧪 Vitest Suite | [![Tests](https://img.shields.io/github/actions/workflow/status/Shikhar-Kesharwani/nabha-telemedicine/test.yml?style=flat-square&color=22d3ee&label=status)](https://github.com/Shikhar-Kesharwani/nabha-telemedicine/actions/workflows/test.yml) | Push / PR |
 | 🛡️ Security | [![Security](https://img.shields.io/github/actions/workflow/status/Shikhar-Kesharwani/nabha-telemedicine/security.yml?style=flat-square&color=a855f7&label=status)](https://github.com/Shikhar-Kesharwani/nabha-telemedicine/actions/workflows/security.yml) | Push / PR |
 | 🚀 Deploy Vercel | [![Vercel](https://img.shields.io/github/actions/workflow/status/Shikhar-Kesharwani/nabha-telemedicine/deploy-vercel.yml?style=flat-square&color=10b981&label=status)](https://github.com/Shikhar-Kesharwani/nabha-telemedicine/actions/workflows/deploy-vercel.yml) | Push to `main` |
 | 📦 Release | [![Release](https://img.shields.io/github/actions/workflow/status/Shikhar-Kesharwani/nabha-telemedicine/release.yml?style=flat-square&color=f59e0b&label=status)](https://github.com/Shikhar-Kesharwani/nabha-telemedicine/actions/workflows/release.yml) | Tag push |
@@ -701,11 +716,30 @@ docker run -d \
 </div>
 
 ```bash
-# Run locally
-npm run lint          # ESLint
-npx tsc --noEmit      # Type check
-npm run build         # Production build
+# 🧪 Automated Test Suite (59 Vitest tests across 5 files)
+npm test
+
+# 📊 Test with coverage report & watch mode
+npm run test:coverage
+npm run test:watch
+
+# 🔍 Type Check & Linting
+npx tsc --noEmit      # Strict TypeScript validation (0 errors)
+npm run lint          # ESLint checks
+npm run build         # Next.js production build (19/19 routes compiled)
 ```
+
+<div align="center">
+
+| Suite | Tests | Target Area |
+| :--- | :---: | :--- |
+| `vitals.test.ts` | **18 passed** | ACC/AHA BP stages, SpO2 hypoxia, pulse bradycardia/tachycardia, glucose categories |
+| `medicines.test.ts` | **11 passed** | Jan Aushadhi generic savings formulas, chemical & brand search algorithms |
+| `session.test.ts` | **11 passed** | Patient/Doctor session decoding, JSON fallback, emergency contact regex parsing |
+| `appointments.test.ts` | **10 passed** | Slot deduplication, user-scoped appointment retrieval, cancellation security |
+| `doctors.test.ts` | **9 passed** | Specialty filter, ID resolution, consultation fee ranges, availability |
+
+</div>
 
 <br/>
 
@@ -713,24 +747,28 @@ npm run build         # Production build
 
 <br/>
 
-## 🗺️ Roadmap
+## 🗺️ Roadmap & Implemented Features
 
 <div align="center">
 
 | Status | Feature | Priority |
 | :---: | :--- | :---: |
-| ✅ | AI symptom checker with ICD-10 mapping | 🔴 |
-| ✅ | Real-time doctor-patient chat + file sharing | 🔴 |
-| ✅ | Pre-consultation authorization workflow | 🔴 |
-| ✅ | WebRTC video and voice calls | 🔴 |
-| ✅ | Doctor presence heartbeat tracking | 🟡 |
-| ✅ | PWA support (installable, offline) | 🟡 |
-| ✅ | Dual deployment (Cloud + Docker) | 🟡 |
-| ⬜ | End-to-end encryption for chat | 🔴 |
-| ⬜ | Push notifications (appointment reminders) | 🟡 |
-| ⬜ | Hindi & Punjabi UI translations | 🟡 |
-| ⬜ | ABHA / Ayushman Bharat integration | 🟢 |
-| ⬜ | Razorpay payment gateway | 🟢 |
+| ✅ | AI symptom checker with ICD-10 mapping (16 Punjab regional diseases) | 🔴 |
+| ✅ | Real-time doctor-patient chat + file sharing & base64 attachments | 🔴 |
+| ✅ | Pre-consultation authorization workflow (doctor permission gate) | 🔴 |
+| ✅ | WebRTC peer-to-peer encrypted video and voice calls | 🔴 |
+| ✅ | 59-test automated Vitest CI suite + real GitHub Actions pipelines | 🔴 |
+| ✅ | Recruiter 1-Click Demo Persona Switcher (Patient / Doctor) | 🟡 |
+| ✅ | Vercel serverless `/tmp` SQLite resilience (EROFS fallback) | 🟡 |
+| ✅ | Hindi (हिन्दी) & Punjabi (ਪੰਜਾਬੀ) voice & UI localization (Web Speech + i18n) | 🟡 |
+| ✅ | Civil Hospital Nabha OPD schedule guide & 108 Emergency routing | 🟡 |
+| ✅ | Doctor presence heartbeat tracking & multi-tab BroadcastChannel sync | 🟡 |
+| ✅ | PWA support with background service workers & offline caching | 🟡 |
+| ✅ | Dual deployment (Vercel Serverless + Alpine Docker) | 🟡 |
+| ⬜ | End-to-end asymmetric encryption for stored chat messages | 🔴 |
+| ⬜ | WebPush notifications for scheduled appointments | 🟡 |
+| ⬜ | Ayushman Bharat Digital Mission (ABDM) / ABHA ID integration | 🟢 |
+| ⬜ | Razorpay payment gateway integration | 🟢 |
 
 </div>
 
@@ -762,9 +800,7 @@ git push origin feature/amazing-feature
 
 ## 📄 License
 
-<!-- TODO: Add a LICENSE file to the repository -->
-
-This project is available for use. See the repository for details.
+Distributed under the [MIT License](LICENSE). Copyright &copy; 2025-2026 Shikhar Kesharwani.
 
 <br/>
 
