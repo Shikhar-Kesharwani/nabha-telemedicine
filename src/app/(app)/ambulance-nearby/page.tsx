@@ -257,7 +257,7 @@ export default function AmbulanceNearbyPage() {
             </div>
             <div className="flex items-start gap-3">
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-amber)]/20 text-xs font-bold text-[var(--accent-amber)]">3</span>
-              <p className="text-sm text-[var(--text-primary)] mt-0.5">Call 108 immediately — tell them 'pesticide poisoning'</p>
+              <p className="text-sm text-[var(--text-primary)] mt-0.5">Call 108 immediately — tell them &ldquo;pesticide poisoning&rdquo;</p>
             </div>
             <div className="flex items-start gap-3">
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-amber)]/20 text-xs font-bold text-[var(--accent-amber)]">4</span>

@@ -336,7 +336,7 @@ export default function AppointmentsPage() {
               <CalendarDays className="mx-auto h-12 w-12 text-[var(--text-muted)] opacity-50" />
               <div>
                 <h3 className="text-lg font-bold text-[var(--text-primary)]">No Active Appointments Found</h3>
-                <p className="text-xs text-[var(--text-muted)] mt-1">You haven't scheduled any doctor consultations yet.</p>
+                <p className="text-xs text-[var(--text-muted)] mt-1">You haven&apos;t scheduled any doctor consultations yet.</p>
               </div>
               <button
                 onClick={() => setActiveTab("browse")}

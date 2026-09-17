@@ -559,7 +559,7 @@ export default function DashboardPage() {
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-[var(--accent-amber)]">Daily AI Wellness Advice</p>
               <p className="text-sm text-[var(--text-primary)] font-medium mt-1 leading-relaxed">
-                "{healthTip || 'Hydration activates metabolic energy. Drink at least 8 glasses of water daily.'}"
+                &ldquo;{healthTip || 'Hydration activates metabolic energy. Drink at least 8 glasses of water daily.'}&rdquo;
               </p>
             </div>
           </div>

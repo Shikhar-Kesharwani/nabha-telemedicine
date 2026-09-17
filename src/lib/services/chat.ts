@@ -1,5 +1,4 @@
 'use server';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import db from '@/lib/db';
 import type { Message as MessageType } from '@/types/db';
 import { getDoctorById } from './doctors';

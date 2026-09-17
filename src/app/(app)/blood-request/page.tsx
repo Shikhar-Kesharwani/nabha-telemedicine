@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Heart,
@@ -54,11 +54,7 @@ export default function BloodRequestPage() {
   const [donorPhone, setDonorPhone] = useState('');
   const [donorLocation, setDonorLocation] = useState('Nabha');
 
-  useEffect(() => {
-    loadData();
-  }, [selectedGroupFilter]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const reqList = await getBloodRequests();
@@ -70,7 +66,11 @@ export default function BloodRequestPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedGroupFilter]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleCreateRequest = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,6 +1,6 @@
 
 import { cn } from '@/lib/utils';
-import { useSidebar } from './ui/sidebar';
+import { useOptionalSidebar } from './ui/sidebar';
 import './app-logo.css';
 
 
@@ -30,10 +30,7 @@ export function AppLogo({
   className?: string;
   variant?: 'default' | 'bright';
 }) {
-  let sidebar: ReturnType<typeof useSidebar> | undefined;
-  try {
-    sidebar = useSidebar();
-  } catch (e) {}
+  const sidebar = useOptionalSidebar();
 
   if (variant === 'bright') {
     return (

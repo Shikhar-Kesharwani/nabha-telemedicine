@@ -142,10 +142,11 @@ export default function VideoCallRoomPage() {
       }
     };
 
+    const currentLocalVideo = localVideoRef.current;
     return () => {
       localStreamRef.current?.getTracks().forEach((t) => t.stop());
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = null;
+      if (currentLocalVideo) {
+        currentLocalVideo.srcObject = null;
       }
       pc.close();
       signalingChannel.close();

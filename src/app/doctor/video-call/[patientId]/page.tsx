@@ -55,9 +55,11 @@ function VideoCallComponent() {
   }, [patientId]);
 
   useEffect(() => {
+    let activeStream: MediaStream | null = null;
     const getCameraPermission = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        activeStream = stream;
         setHasCameraPermission(true);
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -77,8 +79,8 @@ function VideoCallComponent() {
 
     return () => {
       // Cleanup: stop media tracks when component unmounts
-      if (videoRef.current && videoRef.current.srcObject) {
-        (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+      if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
       }
     };
   }, [toast]);

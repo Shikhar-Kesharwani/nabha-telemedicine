@@ -599,7 +599,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-slate-400 text-sm sm:text-base leading-relaxed max-w-xl">
-              Connect with certified doctors from Rajindra Hospital Patiala & SDH Civil Hospital Nabha, locate Jan Aushadhi generic stores, and manage your family's health records in one place.
+              Connect with certified doctors from Rajindra Hospital Patiala & SDH Civil Hospital Nabha, locate Jan Aushadhi generic stores, and manage your family&apos;s health records in one place.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -703,7 +703,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="rounded-3xl border border-white/10 bg-[#0a0f1d] p-6 space-y-3">
             <p className="text-xs text-slate-300 italic leading-relaxed">
-              "Got my routine diabetes and BP medicines from Jan Aushadhi Kendra right outside Civil Hospital Nabha. Saved over ₹1,200 monthly compared to market prices."
+              &ldquo;Got my routine diabetes and BP medicines from Jan Aushadhi Kendra right outside Civil Hospital Nabha. Saved over ₹1,200 monthly compared to market prices.&rdquo;
             </p>
             <div>
               <p className="font-bold text-xs text-white">Harjinder Singh</p>
@@ -713,7 +713,7 @@ export default function LandingPage() {
 
           <div className="rounded-3xl border border-white/10 bg-[#0a0f1d] p-6 space-y-3">
             <p className="text-xs text-slate-300 italic leading-relaxed">
-              "Booked a video consultation with Dr. Gurpreet Singh at Rajindra Hospital without traveling 28 km to Patiala or standing in long OPD queues."
+              &ldquo;Booked a video consultation with Dr. Gurpreet Singh at Rajindra Hospital without traveling 28 km to Patiala or standing in long OPD queues.&rdquo;
             </p>
             <div>
               <p className="font-bold text-xs text-white">Simran Kaur</p>
