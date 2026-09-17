@@ -139,6 +139,43 @@ db.exec(`
     bloodGlucose INTEGER NOT NULL,
     recordedAt TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS symptom_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER,
+    symptomQuery TEXT NOT NULL,
+    predictedCondition TEXT NOT NULL,
+    icdCode TEXT NOT NULL,
+    urgency TEXT NOT NULL,
+    specialist TEXT NOT NULL,
+    location TEXT NOT NULL DEFAULT 'Nabha',
+    timestamp TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS blood_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patientName TEXT NOT NULL,
+    bloodGroup TEXT NOT NULL,
+    unitsNeeded INTEGER NOT NULL DEFAULT 1,
+    hospital TEXT NOT NULL,
+    urgency TEXT NOT NULL DEFAULT 'Urgent',
+    contactPerson TEXT NOT NULL,
+    contactPhone TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'ACTIVE',
+    notes TEXT,
+    createdAt TEXT NOT NULL,
+    expiresAt TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS blood_donors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    bloodGroup TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    location TEXT NOT NULL,
+    lastDonated TEXT,
+    isAvailable INTEGER NOT NULL DEFAULT 1
+  );
 `);
 
 // Migration: Add medical profile & doctor location columns if they don't exist
@@ -330,6 +367,64 @@ function seedIfEmpty() {
       ];
       for (const m of initialMeds) {
         insertMed.run(m.brandName, m.chemicalName, m.category, m.priceRupees, m.inStock, m.pharmacyName);
+      }
+    }
+
+    // Seed Symptom Logs (Epidemiological surveillance baseline)
+    const logCount = db.prepare('SELECT COUNT(*) as count FROM symptom_logs').get() as { count: number };
+    if (logCount.count === 0) {
+      const insertLog = db.prepare(
+        'INSERT INTO symptom_logs (symptomQuery, predictedCondition, icdCode, urgency, specialist, location, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)'
+      );
+      const now = Date.now();
+      const oneDay = 86400000;
+      const initialLogs = [
+        { q: "high fever and breakbone joint pain", c: "Dengue Hemorrhagic Fever", icd: "A90", u: "Immediate Medical Attention", s: "General Physician", loc: "Patiala Gate, Nabha", ts: new Date(now - oneDay * 0.5).toISOString() },
+        { q: "fever with severe eye pain and rash", c: "Dengue Hemorrhagic Fever", icd: "A90", u: "Immediate Medical Attention", s: "General Physician", loc: "Model Town, Nabha", ts: new Date(now - oneDay * 1.2).toISOString() },
+        { q: "stepwise high fever and stomach pain", c: "Typhoid Fever (Salmonella Typhi)", icd: "A01.0", u: "Consultation Recommended", s: "General Physician", loc: "Bhadson Road, Nabha", ts: new Date(now - oneDay * 1.8).toISOString() },
+        { q: "loose motions and dehydration vomiting", c: "Acute Gastroenteritis / Waterborne Diarrhea", icd: "A09", u: "Consultation Recommended", s: "General Physician", loc: "Circular Road, Nabha", ts: new Date(now - oneDay * 2.1).toISOString() },
+        { q: "severe joint pain and dengue suspicion", c: "Dengue Hemorrhagic Fever", icd: "A90", u: "Immediate Medical Attention", s: "General Physician", loc: "Civil Hospital Area, Nabha", ts: new Date(now - oneDay * 2.8).toISOString() },
+        { q: "heavy smoke inhalation and breathlessness", c: "COPD Exacerbation / Stubble Smoke Bronchospasm", icd: "J44.1", u: "Consultation Recommended", s: "Pulmonologist", loc: "Duladdi Gate, Nabha", ts: new Date(now - oneDay * 3.5).toISOString() },
+        { q: "fever chills rigors sweating", c: "Malaria (Plasmodium Falciparum/Vivax)", icd: "B50.9", u: "Consultation Recommended", s: "General Physician", loc: "Alhoran Gate, Nabha", ts: new Date(now - oneDay * 4.0).toISOString() },
+        { q: "breakbone fever platelet low", c: "Dengue Hemorrhagic Fever", icd: "A90", u: "Immediate Medical Attention", s: "General Physician", loc: "Mehs Gate, Nabha", ts: new Date(now - oneDay * 4.5).toISOString() },
+      ];
+      for (const l of initialLogs) {
+        insertLog.run(l.q, l.c, l.icd, l.u, l.s, l.loc, l.ts);
+      }
+    }
+
+    // Seed Blood Requests
+    const reqCount = db.prepare('SELECT COUNT(*) as count FROM blood_requests').get() as { count: number };
+    if (reqCount.count === 0) {
+      const insertReq = db.prepare(
+        'INSERT INTO blood_requests (patientName, bloodGroup, unitsNeeded, hospital, urgency, contactPerson, contactPhone, status, notes, createdAt, expiresAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      );
+      const now = new Date();
+      const exp1 = new Date(Date.now() + 18 * 3600000).toISOString();
+      const exp2 = new Date(Date.now() + 36 * 3600000).toISOString();
+      insertReq.run("Kuldeep Singh (Age 48)", "O+", 2, "Civil Hospital Nabha (Emergency Ward)", "CRITICAL", "Paramjit Kaur", "+91 98145 33221", "ACTIVE", "Required for emergency surgical repair post-road accident on Nabha-Patiala road.", now.toISOString(), exp1);
+      insertReq.run("Smt. Harbhajan Kaur (Age 64)", "B+", 1, "Rajindra Hospital, Patiala (ICU)", "URGENT", "Jaspreet Singh", "+91 98720 11994", "ACTIVE", "Severe thrombocytopenia / Dengue complication. Platelets + PRBC required.", now.toISOString(), exp2);
+      insertReq.run("Navjot Singh (Age 29)", "AB-", 1, "Vardaan Multispeciality Hospital, Nabha", "MODERATE", "Sandeep Sharma", "+91 94171 44556", "ACTIVE", "Scheduled orthopedic fracture fixation surgery tomorrow morning.", now.toISOString(), exp2);
+    }
+
+    // Seed Blood Donors Registry
+    const donorCount = db.prepare('SELECT COUNT(*) as count FROM blood_donors').get() as { count: number };
+    if (donorCount.count === 0) {
+      const insertDonor = db.prepare(
+        'INSERT INTO blood_donors (name, bloodGroup, phone, location, lastDonated, isAvailable) VALUES (?, ?, ?, ?, ?, ?)'
+      );
+      const donors = [
+        { name: "Manpreet Singh Dhillon", bg: "O+", phone: "+91 98145 00981", loc: "Model Town, Nabha", ld: "2024-05-10", a: 1 },
+        { name: "Sukhdev Singh Gill", bg: "O-", phone: "+91 98765 44321", loc: "Patiala Gate, Nabha", ld: "2024-04-12", a: 1 },
+        { name: "Amanjot Kaur", bg: "A+", phone: "+91 94171 88776", loc: "Near Ripudaman College, Nabha", ld: "2024-06-01", a: 1 },
+        { name: "Gurwinder Singh Brar", bg: "B+", phone: "+91 98555 22110", loc: "Bhadson, Nabha Rural", ld: "2024-03-20", a: 1 },
+        { name: "Dr. Sandeep Kaushal", bg: "AB+", phone: "+91 98150 33445", loc: "Civil Hospital Quarters, Nabha", ld: "2024-05-25", a: 1 },
+        { name: "Ravinder Singh Chahal", bg: "B-", phone: "+91 98721 66554", loc: "Circular Road, Nabha", ld: "2024-02-14", a: 1 },
+        { name: "Harpreet Singh Sidhu", bg: "A-", phone: "+91 94172 99001", loc: "Duladdi, Nabha", ld: "2024-06-15", a: 1 },
+        { name: "Jaswinder Singh Cheema", bg: "AB-", phone: "+91 98146 77889", loc: "Alhoran, Nabha", ld: "2024-01-10", a: 1 },
+      ];
+      for (const d of donors) {
+        insertDonor.run(d.name, d.bg, d.phone, d.loc, d.ld, d.a);
       }
     }
   } catch (err) {

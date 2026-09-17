@@ -66,6 +66,21 @@ export async function aiSymptomGuidance({
   // Execute Dataset-Trained Local Medical Diagnostic AI Model
   const datasetResult = predictFromDataset(sanitizedSymptoms);
 
+  const topDiag = datasetResult.differentialDiagnoses[0];
+  if (topDiag) {
+    // Log to Nabha community surveillance in background
+    try {
+      const { logSymptomSurveillance } = await import('@/lib/services/symptom-surveillance');
+      await logSymptomSurveillance({
+        symptomQuery: sanitizedSymptoms,
+        predictedCondition: topDiag.condition,
+        icdCode: topDiag.icdCode || 'R69',
+        urgency: datasetResult.urgency,
+        specialist: datasetResult.specialistType,
+      });
+    } catch (_) {}
+  }
+
   return {
     urgency: datasetResult.urgency,
     specialistType: datasetResult.specialistType,

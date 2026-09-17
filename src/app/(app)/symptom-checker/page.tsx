@@ -216,6 +216,71 @@ export default function SymptomCheckerPage() {
             </StatusBadge>
           </div>
 
+          {/* Pesticide / Agrochemical Poisoning Critical Emergency Protocol */}
+          {(result.differentialDiagnoses.some(
+            (d) =>
+              d.condition.toLowerCase().includes('pesticide') ||
+              d.condition.toLowerCase().includes('organophosphate') ||
+              d.explanation.toLowerCase().includes('cholinergic')
+          ) ||
+            symptoms.toLowerCase().includes('pesticide') ||
+            symptoms.toLowerCase().includes('spray') ||
+            symptoms.toLowerCase().includes('poison')) && (
+            <div className="p-5 rounded-xl border-2 border-red-500 bg-red-950/40 space-y-4 shadow-xl shadow-red-950/50">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full flex items-center justify-center bg-red-500 text-white font-black animate-pulse">
+                  ⚠️
+                </div>
+                <div>
+                  <h4 className="text-sm font-black text-red-300 uppercase tracking-wide">
+                    CRITICAL TOXICOLOGY DIRECTIVE · Suspected Organophosphate / Pesticide Exposure
+                  </h4>
+                  <p className="text-xs text-red-200">
+                    Highest farm emergency in Punjab. Act within minutes to prevent respiratory arrest.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-200">
+                <div className="p-3 rounded-lg bg-black/50 border border-red-500/30 space-y-1">
+                  <strong className="text-red-400 block">🛑 DO NOT INDUCE VOMITING</strong>
+                  <p className="text-slate-300">
+                    Inducing vomiting causes chemical aspiration into lungs and fatal chemical pneumonitis.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-lg bg-black/50 border border-red-500/30 space-y-1">
+                  <strong className="text-red-400 block">💧 IMMEDIATE DECONTAMINATION</strong>
+                  <p className="text-slate-300">
+                    Remove all chemical-soaked clothing immediately. Wash skin and eyes with continuous running water for 15 minutes.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-lg bg-black/60 border border-red-500/20 text-xs text-slate-300 space-y-1">
+                <strong className="text-yellow-400">Antidote Availability (Atropine Sulfate & Pralidoxime PAM):</strong>
+                <p>
+                  Emergency antidotes are stocked 24/7 at <strong>Civil Hospital Nabha Emergency</strong> and tertiary ICU at <strong>Rajindra Hospital Patiala</strong> (Phone: 0175-2212058).
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-1">
+                <a
+                  href="/ambulance-nearby"
+                  className="flex-1 py-2.5 rounded-xl bg-red-600 text-white font-bold text-xs flex items-center justify-center gap-2 hover:bg-red-500 transition-all shadow-lg"
+                >
+                  🚨 Dispatch 108 Emergency Ambulance
+                </a>
+                <a
+                  href="tel:1800116117"
+                  className="flex-1 py-2.5 rounded-xl bg-white/10 text-white font-bold text-xs flex items-center justify-center gap-2 hover:bg-white/20 transition-all border border-white/10"
+                >
+                  📞 National Poison Helpline: 1800-116-117
+                </a>
+              </div>
+            </div>
+          )}
+
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Recommended Specialist</p>
             <p className="text-sm font-bold text-[var(--accent-cyan)] mt-1">{result.specialistType}</p>

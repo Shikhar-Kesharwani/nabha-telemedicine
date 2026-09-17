@@ -35,6 +35,7 @@ import { format, parseISO, isToday, isTomorrow } from "date-fns";
 
 import { getLatestVitals, recordVitals } from "@/lib/services/vitals";
 import { getSession } from "@/lib/session";
+import { getSurveillanceBulletin } from "@/lib/services/symptom-surveillance";
 
 const generateRecentMonthsChartData = () => {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -93,6 +94,7 @@ export default function DashboardPage() {
   const [stockNotifications, setStockNotifications] = useState<StockNotification[]>([]);
   const [healthTip, setHealthTip] = useState("");
   const [dismissedSeasonalAlert, setDismissedSeasonalAlert] = useState(false);
+  const [surveillance, setSurveillance] = useState<any>(null);
   const { toast } = useToast();
 
   // Vitals State
@@ -131,6 +133,10 @@ export default function DashboardPage() {
         setDiastolic(savedVitals.diastolic);
         setSpO2(savedVitals.spO2);
       }
+
+      // Load epidemiological surveillance bulletin
+      const bulletin = await getSurveillanceBulletin();
+      setSurveillance(bulletin);
     }
     loadData();
   }, [userId]);
@@ -284,6 +290,64 @@ export default function DashboardPage() {
           </button>
         </div>
       ))}
+
+      {/* Nabha Block Epidemiological Surveillance Bulletin */}
+      {surveillance && (
+        <div
+          className="p-5 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+          style={{
+            background:
+              surveillance.alertTier === 'HIGH_ALERT'
+                ? 'linear-gradient(135deg, rgba(239,68,68,0.12) 0%, rgba(15,15,30,0.95) 100%)'
+                : 'linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(15,15,30,0.95) 100%)',
+            borderColor: surveillance.alertTier === 'HIGH_ALERT' ? 'rgba(239,68,68,0.3)' : 'rgba(245,158,11,0.3)',
+          }}
+        >
+          <div className="flex items-start gap-3.5">
+            <div
+              className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
+                surveillance.alertTier === 'HIGH_ALERT' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'
+              }`}
+            >
+              <TriangleAlert size={20} className="animate-pulse" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-black uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                  Nabha Block Health Surveillance
+                </span>
+                <span className="text-[10px] font-black uppercase text-red-400 bg-red-500/10 px-2 py-0.5 rounded">
+                  {surveillance.alertTier.replace('_', ' ')}
+                </span>
+                <span className="text-[11px] text-slate-400">
+                  {surveillance.totalQueries7Days} local cases logged this week
+                </span>
+              </div>
+              <h4 className="text-sm font-bold text-white">
+                Primary Cluster Watch: <span className="text-amber-300">{surveillance.primaryThreat}</span>
+              </h4>
+              <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                {surveillance.advisory}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0 w-full md:w-auto">
+            <Link
+              href="/symptom-checker"
+              className="flex-1 md:flex-none px-3.5 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/10 text-center transition-all"
+            >
+              Self-Triage Symptoms
+            </Link>
+            <Link
+              href="/civil-hospital-opd"
+              className="flex-1 md:flex-none px-3.5 py-2 rounded-xl text-xs font-bold bg-cyan-500 text-black hover:bg-cyan-400 text-center transition-all"
+            >
+              Fever Clinic OPD
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Seasonal Alert Banner */}
       {!dismissedSeasonalAlert && SEASONAL_ALERTS[new Date().getMonth() + 1] && (() => {

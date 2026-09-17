@@ -716,7 +716,7 @@ docker run -d \
 </div>
 
 ```bash
-# 🧪 Automated Test Suite (59 Vitest tests across 5 files)
+# 🧪 Automated Test Suite (70 Vitest tests across 7 files)
 npm test
 
 # 📊 Test with coverage report & watch mode
@@ -726,7 +726,7 @@ npm run test:watch
 # 🔍 Type Check & Linting
 npx tsc --noEmit      # Strict TypeScript validation (0 errors)
 npm run lint          # ESLint checks
-npm run build         # Next.js production build (19/19 routes compiled)
+npm run build         # Next.js production build (23/23 routes compiled)
 ```
 
 <div align="center">
@@ -738,6 +738,8 @@ npm run build         # Next.js production build (19/19 routes compiled)
 | `session.test.ts` | **11 passed** | Patient/Doctor session decoding, JSON fallback, emergency contact regex parsing |
 | `appointments.test.ts` | **10 passed** | Slot deduplication, user-scoped appointment retrieval, cancellation security |
 | `doctors.test.ts` | **9 passed** | Specialty filter, ID resolution, consultation fee ranges, availability |
+| `surveillance-bloodbank.test.ts` | **7 passed** | Epidemiological cluster alert thresholds & full red-cell blood donor compatibility |
+| `prescription-scanner.test.ts` | **4 passed** | Prescription OCR mapping, Jan Aushadhi generic prices & Nabha Kendra stock |
 
 </div>
 
@@ -753,18 +755,22 @@ npm run build         # Next.js production build (19/19 routes compiled)
 
 | Status | Feature | Priority |
 | :---: | :--- | :---: |
+| ✅ | Prescription OCR Scanner + Jan Aushadhi Generic Matcher (up to 85% savings) | 🔴 |
+| ✅ | Agrochemical & Pesticide Poisoning Emergency Protocol (ICD-10 T60 Directive) | 🔴 |
+| ✅ | Real-Time Emergency Blood Request & Voluntary Donor Network (Nabha/Patiala) | 🔴 |
+| ✅ | Punjab Farmer & Community Health Index (Toxicity, CKDu, Stubble Smoke AQI) | 🔴 |
+| ✅ | Punjab Govt Scheme Eligibility Checker (Ayushman MMSBY, Dialysis, Hep-C Fund) | 🔴 |
+| ✅ | Sehat Sahayak Conversational AI Assistant (Punjabi Gurmukhi, Hindi, Voice Input) | 🔴 |
+| ✅ | Epidemiological Outbreak Surveillance Bulletin (7-day community disease tracking) | 🔴 |
 | ✅ | AI symptom checker with ICD-10 mapping (16 Punjab regional diseases) | 🔴 |
 | ✅ | Real-time doctor-patient chat + file sharing & base64 attachments | 🔴 |
 | ✅ | Pre-consultation authorization workflow (doctor permission gate) | 🔴 |
 | ✅ | WebRTC peer-to-peer encrypted video and voice calls | 🔴 |
-| ✅ | 59-test automated Vitest CI suite + real GitHub Actions pipelines | 🔴 |
+| ✅ | 70-test automated Vitest CI suite + real GitHub Actions pipelines | 🔴 |
 | ✅ | Recruiter 1-Click Demo Persona Switcher (Patient / Doctor) | 🟡 |
 | ✅ | Vercel serverless `/tmp` SQLite resilience (EROFS fallback) | 🟡 |
-| ✅ | Hindi (हिन्दी) & Punjabi (ਪੰਜਾਬੀ) voice & UI localization (Web Speech + i18n) | 🟡 |
 | ✅ | Civil Hospital Nabha OPD schedule guide & 108 Emergency routing | 🟡 |
-| ✅ | Doctor presence heartbeat tracking & multi-tab BroadcastChannel sync | 🟡 |
 | ✅ | PWA support with background service workers & offline caching | 🟡 |
-| ✅ | Dual deployment (Vercel Serverless + Alpine Docker) | 🟡 |
 | ⬜ | End-to-end asymmetric encryption for stored chat messages | 🔴 |
 | ⬜ | WebPush notifications for scheduled appointments | 🟡 |
 | ⬜ | Ayushman Bharat Digital Mission (ABDM) / ABHA ID integration | 🟢 |

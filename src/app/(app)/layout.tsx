@@ -29,6 +29,10 @@ import {
   Bell,
   Search,
   Building2,
+  ScanLine,
+  ShieldCheck,
+  Droplet,
+  Wheat,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -36,19 +40,24 @@ import { AvatarWithRing } from "@/components/primitives";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { I18nextProvider } from "react-i18next";
+import { SehatSahayakChat } from "@/components/sehat-sahayak-chat";
 
 const NAV_ITEMS = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, accent: "indigo" },
   { label: "Profile", path: "/profile", icon: User, accent: "indigo" },
   { label: "Appointments", path: "/appointments", icon: CalendarDays, accent: "cyan" },
   { label: "Symptom Checker", path: "/symptom-checker", icon: HeartPulse, accent: "emerald", badge: "AI" },
+  { label: "Scan Prescription", path: "/prescription-scanner", icon: ScanLine, accent: "emerald", badge: "OCR" },
+  { label: "Govt Schemes", path: "/scheme-checker", icon: ShieldCheck, accent: "indigo" },
+  { label: "Blood Network", path: "/blood-request", icon: Droplet, accent: "red" },
+  { label: "Farmer Health Index", path: "/health-index", icon: Wheat, accent: "amber" },
+  { label: "Civil Hospital OPD", path: "/civil-hospital-opd", icon: Building2, accent: "emerald" },
   { label: "Doctor Chat", path: "/doctor-chat", icon: MessageSquare, accent: "violet" },
   { label: "Health Records", path: "/health-records", icon: FileText, accent: "amber" },
   { label: "Video Call", path: "/video-call", icon: Video, accent: "cyan" },
   { label: "Voice Call", path: "/voice-call", icon: Mic, accent: "violet" },
   { label: "Medicine Finder", path: "/medicine-finder", icon: Pill, accent: "emerald" },
   { label: "Pharmacies", path: "/pharmacy-locator", icon: MapPin, accent: "emerald" },
-  { label: "Civil Hospital OPD", path: "/civil-hospital-opd", icon: Building2, accent: "emerald" },
   { label: "Ambulance Nearby", path: "/ambulance-nearby", icon: Siren, accent: "red" },
 ] as const;
 
@@ -719,6 +728,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             {children}
           </motion.main>
         </div>
+        <SehatSahayakChat />
         <DemoSwitcher />
       </div>
     </I18nextProvider>
